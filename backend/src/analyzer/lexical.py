@@ -24,11 +24,11 @@ reservadas = {
 tokens = (
     'DELIMITER',
     # --- INICIO APORTE SOFIA IZAGUIRRE ---
-    'ID', 'ASSIGN',
+    'ID', 'ASSIGN', 'ENTERO',
     # --- FIN APORTE SOFIA IZAGUIRRE ---
     
     # --- INICIO APORTE DANIEL CORTEZ ---
-    'RELACIONAL', 'LOGICO', 'FLECHA', 'NULO' 
+    'RELACIONAL', 'LOGICO', 'FLECHA', 'NULO', 'DECIMAL'
     # --- FIN APORTE DANIEL CORTEZ ---
     
     # [AQUÍ ALEX AÑADIRÁ SUS TOKENS COMO 'ARITMETICO']
@@ -79,6 +79,14 @@ def t_ID(t):
 # --- FIN APORTE SOFIA IZAGUIRRE ---
 
 # --- INICIO APORTE DANIEL CORTEZ ---
+# Reconocer números decimales (ej. 12.5)
+def t_DECIMAL(t):
+    r'\d+\.\d+'
+    t.value = float(t.value)
+    return t
+# --- FIN APORTE DANIEL CORTEZ ---
+
+# --- INICIO APORTE DANIEL CORTEZ ---
 # Función robusta para Reglas de Comentarios (De una y múltiples líneas)
 def t_COMMENT(t):
     r'(//.*)|(/\*(.|\n)*?\*/)'
@@ -86,6 +94,14 @@ def t_COMMENT(t):
     t.lexer.lineno += t.value.count('\n')
     pass # Usamos pass para que el lexer lo ignore completamente y no lo meta en el log (talvez podriamos quitarlo despues)
 # --- FIN APORTE DANIEL CORTEZ ---
+
+# --- INICIO APORTE SOFIA IZAGUIRRE ---
+# Reconocer números enteros (ej. 5)
+def t_ENTERO(t):
+    r'\d+'
+    t.value = int(t.value)
+    return t
+# --- FIN APORTE SOFIA IZAGUIRRE ---
 
 # Regla OBLIGATORIA para contar los saltos de línea
 def t_newline(t):
