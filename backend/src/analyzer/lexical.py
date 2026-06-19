@@ -2,14 +2,17 @@ import ply.lex as lex
 
 tokens = (
     # Identificadores
-    'ID',
+    'ID', 'DELIMITER',
     
     # Palabras Reservadas
     'VAR', 'FINAL', 'CONST',
-    'IF', 'ELSE', 'RETURN',
+    'TRUE', 'FALSE',
+    'IF', 'ELSE', 'FOR', 'WHILE',
+    'RETURN', 'PRINT', 'SWITCH', 'BREAK', 'VOID',
     
     # Tipos de datos 
-    'INT', 'MAP',
+    'INT', 'DOUBLE', 'STRING', 'BOOL',
+    'MAP', 'SET', 'LIST',
     
     # Operador de asignación
     'ASSIGN',
@@ -23,19 +26,29 @@ reserved = {
     'if': 'IF',
     'else': 'ELSE',
     'return': 'RETURN',
+    'true': 'TRUE',
+    'false': 'FALSE',
+    'for': 'FOR',
+    'while': 'WHILE',
+    'print': 'PRINT',
+    'switch': 'SWITCH',
+    'break': 'BREAK',
+    'void': 'VOID',
     'int': 'INT',
     'Map': 'MAP',
+    'double': 'DOUBLE',
+    'String': 'STRING',
+    'bool': 'BOOL',
+    'Set': 'SET',
+    'List': 'LIST',
 }
-# PALABRAS RESERVADAS - DESARROLLADOR 1
+# FIN PALABRAS RESERVADAS - DESARROLLADOR 1
 
 log = ''
 
 t_DELIMITER = r'[\(\);]\w*'
-#
-t_ID = r'[a-zA-Z_]\w*'
 
 # OPERADOR DE ASIGNACIÓN - DESARROLLADOR 1
-
 t_ASSIGN = r'='
 
 # REGLAS PARA IDENTIFICADORES - DESARROLLADOR 1 
