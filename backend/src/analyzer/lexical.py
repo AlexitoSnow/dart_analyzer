@@ -1,23 +1,105 @@
 import ply.lex as lex
 
-tokens = ('ID', 'DELIMITER', 'COMMENT')
+# 1. DICCIONARIO DE PALABRAS RESERVADAS
+reservadas = {
+    # --- INICIO APORTE SOFIA IZAGUIRRE ---
+    'var': 'VAR', 'final': 'FINAL', 'const': 'CONST',
+    'if': 'IF', 'else': 'ELSE', 'for': 'FOR', 'while': 'WHILE',
+    'return': 'RETURN', 'print': 'PRINT', 'switch': 'SWITCH',
+    'break': 'BREAK', 'void': 'VOID', 'true': 'TRUE', 'false': 'FALSE',
+    'int': 'INT', 'Map': 'MAP',
+    # --- FIN APORTE SOFIA IZAGUIRRE ---
+
+    # --- INICIO APORTE DANIEL CORTEZ ---
+    'double': 'DOUBLE',
+    'bool': 'BOOL',
+    'Set': 'SET'
+    # --- FIN APORTE DANIEL CORTEZ ---
+    
+    # [AQUÍ ALEX AÑADIRÁ 'String' y 'List']
+}
+
+
+# 2. TUPLA DE TOKENS
+tokens = (
+    'DELIMITER',
+    # --- INICIO APORTE SOFIA IZAGUIRRE ---
+    'ID', 'ASSIGN',
+    # --- FIN APORTE SOFIA IZAGUIRRE ---
+    
+    # --- INICIO APORTE DANIEL CORTEZ ---
+    'RELACIONAL', 'LOGICO', 'FLECHA', 'NULO' 
+    # --- FIN APORTE DANIEL CORTEZ ---
+    
+    # [AQUÍ ALEX AÑADIRÁ SUS TOKENS COMO 'ARITMETICO']
+) + tuple(reservadas.values())
+
 log = ''
 
-t_DELIMITER = r'[\(\);]\w*'
-t_ID = r'[a-zA-Z_]\w*'
+# Regla OBLIGATORIA para ignorar espacios y tabulaciones
+t_ignore = ' \t'
 
+
+# 3. DECLARACIÓN DE SÍMBOLOS DIRECTOS
+
+# --- INICIO APORTE SOFIA IZAGUIRRE ---
+# Operador de asignación
+t_ASSIGN = r'='
+# --- FIN APORTE SOFIA IZAGUIRRE ---
+
+# --- INICIO APORTE DANIEL CORTEZ ---
+# Operador de Funciones (Lambda)
+t_FLECHA = r'=>'
+# Operadores relacionales (Importante: los dobles ==, >= van primero que los simples >)
+t_RELACIONAL = r'==|!=|>=|<=|>|<'
+# Operadores Lógicos (Escapamos el pipe \| porque es especial en regex)
+t_LOGICO = r'&&|\|\||!'
+# Manejo de nulos (Escapamos la interrogación \?)
+t_NULO = r'\?'
+# --- FIN APORTE DANIEL CORTEZ ---
+
+# [AQUÍ ALEX AÑADIRÁ SUS SÍMBOLOS COMO t_ARITMETICO]
+
+
+# --- INICIO APORTE ALEX NIEVES ---
+# Delimitador base
+t_DELIMITER = r'[\(\);\{\}\[\],:\.]'
+# --- FIN APORTE ALEX NIEVES ---
+
+
+# 4. FUNCIONES DE EVALUACIÓN COMPLEJA
+
+# --- INICIO APORTE SOFIA IZAGUIRRE ---
+# Función para Identificadores y filtrado de Palabras Reservadas
+def t_ID(t):
+    r'[a-zA-Z_][a-zA-Z0-9_]*'
+    # Verifica si el texto ingresado es una palabra reservada o una variable normal
+    t.type = reservadas.get(t.value, 'ID') 
+    return t
+# --- FIN APORTE SOFIA IZAGUIRRE ---
+
+# --- INICIO APORTE DANIEL CORTEZ ---
+# Función robusta para Reglas de Comentarios (De una y múltiples líneas)
 def t_COMMENT(t):
-    r'//.*'
-    t.lexer.skip(len(t.value))
+    r'(//.*)|(/\*(.|\n)*?\*/)'
+    # Contamos los saltos de línea dentro del bloque /* */ para no desajustar el contador de errores
+    t.lexer.lineno += t.value.count('\n')
+    pass # Usamos pass para que el lexer lo ignore completamente y no lo meta en el log (talvez podriamos quitarlo despues)
+# --- FIN APORTE DANIEL CORTEZ ---
 
+# Regla OBLIGATORIA para contar los saltos de línea
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
+
+# Regla para manejar caracteres no reconocidos
 def t_error(t):
     global log
-
-    print(f"Caracter ilegal: '{t.value[0]}'")
-
-    log += f'Caracter ilegal: {t.value[0]}\n'
+    print(f"Caracter ilegal: '{t.value[0]}' en la linea {t.lineno}")
+    log += f"Caracter ilegal: '{t.value[0]}' en la linea {t.lineno}\n"
     t.lexer.skip(1)
 
+# Construcción del lexer
 lexer = lex.lex()
 
 def lexical_analysis(data: str) -> str:
