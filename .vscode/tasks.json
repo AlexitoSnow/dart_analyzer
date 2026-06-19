@@ -1,0 +1,30 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Initialize venv",
+            "type": "shell",
+            "command": "python3 -m venv venv && source venv/bin/activate",
+            "windows": {
+                "command": "python -m venv venv && .\\venv\\Scripts\\Activate.ps1"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/backend"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Install Dependencies",
+            "type": "shell",
+            "command": "source venv/bin/activate && pip install -r requirements.txt",
+            "windows": {
+                "command": ".\\venv\\Scripts\\Activate.ps1; pip install -r requirements.txt"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/backend"
+            },
+            "problemMatcher": [],
+            "dependsOn": "Initialize venv"
+        }
+    ]
+}
