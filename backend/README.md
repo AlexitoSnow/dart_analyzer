@@ -9,6 +9,18 @@ Para facilitar la preparación del entorno de desarrollo, el proyecto incluye ta
 1. **Initialize venv**: Inicializa un entorno virtual de Python (`venv`) compatible con tu sistema operativo (Windows, macOS o Linux).
 2. **Install Dependencies**: Activa el entorno virtual e instala los paquetes necesarios listados en `requirements.txt`.
 
+Una vez ejecutadas las dos tareas anteriores, el entorno virtual existirá en tu disco duro, pero debes indicarle a Visual Studio Code que lo utilice por defecto. Esto es **obligatorio** para que el depurador (`F5`), el autocompletado y el detector de errores reconozcan las librerías instaladas (como `ply`).
+
+Sigue estos pasos:
+1. Presiona `Ctrl + Shift + P` para abrir la paleta de comandos de VS Code.
+2. Escribe y selecciona la opción **`Python: Select Interpreter`** (Seleccionar intérprete).
+3. En la lista que aparece, busca la ruta que apunte a nuestro entorno virtual. Si no la ves a simple vista, selecciona "Enter interpreter path..." (Introducir ruta del intérprete), dale a "Find..." (Buscar) y navega hasta el ejecutable:
+   * **En Windows:** Selecciona `backend\venv\Scripts\python.exe`
+   * **En macOS/Linux:** Selecciona `backend/venv/bin/python`
+
+> [!TIP]
+> Solo necesitas realizar este paso la primera vez que configures el proyecto. Visual Studio Code guardará tu elección para futuras sesiones de forma automática.
+
 ---
 
 ## Depuración y Ejecución (Launch Configurations)
