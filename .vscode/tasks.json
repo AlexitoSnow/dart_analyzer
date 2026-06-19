@@ -4,9 +4,9 @@
         {
             "label": "Initialize venv",
             "type": "shell",
-            "command": "python3 -m venv venv && source venv/bin/activate",
+            "command": "python3 -m venv venv",
             "windows": {
-                "command": "python -m venv venv && .\\venv\\Scripts\\Activate.ps1"
+                "command": "python -m venv venv"
             },
             "options": {
                 "cwd": "${workspaceFolder}/backend"
@@ -16,9 +16,9 @@
         {
             "label": "Install Dependencies",
             "type": "shell",
-            "command": "source venv/bin/activate && pip install -r requirements.txt",
+            "command": "venv/bin/python -m pip install -r requirements.txt",
             "windows": {
-                "command": ".\\venv\\Scripts\\Activate.ps1; pip install -r requirements.txt"
+                "command": ".\\venv\\Scripts\\python.exe -m pip install -r requirements.txt"
             },
             "options": {
                 "cwd": "${workspaceFolder}/backend"
