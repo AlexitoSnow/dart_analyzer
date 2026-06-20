@@ -2,6 +2,23 @@
 
 Analizador de código Dart desarrollado en Python para procesar algoritmos y generar reportes de análisis léxico, semántico y sintáctico.
 
+## Información Relevante
+
+### Analizador Léxico
+
+Los tokens usan prefijos para una mejor clasificación:
+
+- **DEL_** para Delimitadores
+- **DT_** para Tipos de Datos
+- **ID** para Identificadores
+- **KW_** para Palabras Reservadas (excluyendo tipos de datos)
+- **OP_** para Operadores
+- **VAL_** para Valores
+
+### Logs
+
+Los logs se encuentran en la carpeta `logs/`, los grupales se renombran manualmente para representar una ejecución de prueba de código de todos los integrantes.
+
 ## Configuración del Proyecto (VS Code Tasks)
 
 Para facilitar la preparación del entorno de desarrollo, el proyecto incluye tareas configuradas de VS Code (`tasks.json`). Puedes ejecutarlas presionando `Ctrl + Shift + P` -> `Tasks: Run Task`:
