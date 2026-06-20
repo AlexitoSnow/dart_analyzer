@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 
-authors = ['alexandernieves', 'sofiaizaguirre', 'robertcortez']
+authors = ['AlexanderNieves', 'SofiaIzaguirre', 'DanielCortez']
 
 def write_log(author: int, data: dict) -> None:
     if author > len(authors) - 1 or author < 0:
