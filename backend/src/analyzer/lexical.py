@@ -10,6 +10,10 @@ data_types = {
     'double': 'DT_DOUBLE',
     'bool': 'DT_BOOL',
     'Set': 'DT_SET',
+
+    # --- ALEXANDER NIEVES ---
+    'String': 'DT_STRING',
+    'List': 'DT_LIST',
 }
 
 keywords = {
@@ -28,17 +32,23 @@ keywords = {
     'switch': 'KW_SWITCH',
     'break': 'KW_BREAK',
     'void': 'KW_VOID',
+
+    # -- ALEXANDER NIEVES ---
+    'case': 'KW_CASE',
+    'class': 'KW_CLASS',
+    'default': 'KW_DEFAULT',
+    'null': 'KW_NULL',
 }
 
 
 # 2. TUPLA DE TOKENS
 tokens = (
-    'DELIMITER',
     # --- SOFIA IZAGUIRRE ---
     'ID',
     'OP_ASSIGN',
     
     'VAL_INT',
+    'VAL_MAP',
     
     # --- DANIEL CORTEZ ---
     'OP_ARROW',
@@ -47,6 +57,27 @@ tokens = (
     'OP_RELACIONAL',
 
     'VAL_DOUBLE',
+    'VAL_BOOL',
+    'VAL_SET',
+    
+    # --- ALEXANDER NIEVES ---
+    'OP_ARITHMETIC',
+    'OP_LESS',
+    'OP_GREATHER',
+    
+    'VAL_STRING',
+    'VAL_LIST',
+    
+    'DEL_LBRACE',
+    'DEL_RBRACE',
+    'DEL_LPAREN',
+    'DEL_RPAREN',
+    'DEL_LBRACKET',
+    'DEL_RBRACKET',
+    'DEL_COLON',
+    'DEL_SEMICOLON',
+    'DEL_COMMA',
+    'DEL_DOT',
 ) + tuple(data_types.values()) + tuple(keywords.values())
 
 log = ''
@@ -62,9 +93,23 @@ t_OP_ASSIGN = r'='
 t_OP_ARROW = r'=>'
 t_OP_LOGIC = r'&&|\|\||!'
 t_OP_NULLABLE = r'\?'
-t_OP_RELACIONAL = r'==|!=|>=|<=|>|<'
+t_OP_RELACIONAL = r'==|!=|>=|<='
 
-t_DELIMITER = r'[\(\);\{\}\[\],:\.]'
+# --- ALEXANDER NIEVES ---
+t_DEL_LBRACE   = r'\{'
+t_DEL_RBRACE   = r'\}'
+t_DEL_LBRACKET = r'\['
+t_DEL_RBRACKET = r'\]'
+t_DEL_LPAREN   = r'\('
+t_DEL_RPAREN   = r'\)'
+t_DEL_COMMA    = r','
+t_DEL_SEMICOLON= r';'
+t_DEL_COLON    = r':'
+t_DEL_DOT      = r'\.'
+
+t_OP_ARITHMETIC = r'\+\+|--|\+|-|\*|/|%'
+t_OP_LESS = r'<'
+t_OP_GREATHER = r'>'
 
 def t_ignore_comment(t):
     # Reconoce comentarios de una y múltiples líneas
@@ -84,6 +129,13 @@ def t_VAL_INT(t):
     # Reconoce números enteros
     r'\d+'
     t.value = int(t.value)
+    return t
+
+# --- ALEXANDER NIEVES ---
+def t_VAL_STRING(t):
+    # Reconoce cadenas de texto
+    r'"([^\\]|\\.)*?"|\'([^\\]|\\.)*?\''
+    t.value = t.value[1:-1] # Quitar comillas de los extremos
     return t
 
 # --- SOFIA IZAGUIRRE ---
