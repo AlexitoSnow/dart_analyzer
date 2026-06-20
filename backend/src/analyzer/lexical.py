@@ -35,95 +35,76 @@ keywords = {
 tokens = (
     'DELIMITER',
     # --- SOFIA IZAGUIRRE ---
-    'ID', 'ASSIGN', 'ENTERO',
-    # --- FIN APORTE SOFIA IZAGUIRRE ---
+    'ID',
+    'OP_ASSIGN',
     
-    # --- INICIO APORTE DANIEL CORTEZ ---
-    'RELACIONAL', 'LOGICO', 'FLECHA', 'NULO', 'DECIMAL'
-    # --- FIN APORTE DANIEL CORTEZ ---
+    'VAL_INT',
     
-    # [AQUÍ ALEX AÑADIRÁ SUS TOKENS COMO 'ARITMETICO']
+    # --- DANIEL CORTEZ ---
+    'OP_ARROW',
+    'OP_LOGIC',
+    'OP_NULLABLE',
+    'OP_RELACIONAL',
+
+    'VAL_DOUBLE',
 ) + tuple(data_types.values()) + tuple(keywords.values())
 
 log = ''
 
-# Regla OBLIGATORIA para ignorar espacios y tabulaciones
+# Ignorar espacios y tabulaciones
 t_ignore = ' \t'
 
 
-# 3. DECLARACIÓN DE SÍMBOLOS DIRECTOS
+# --- SOFIA IZAGUIRRE ---
+t_OP_ASSIGN = r'='
 
-# --- INICIO APORTE SOFIA IZAGUIRRE ---
-# Operador de asignación
-t_ASSIGN = r'='
-# --- FIN APORTE SOFIA IZAGUIRRE ---
+# --- DANIEL CORTEZ ---
+t_OP_ARROW = r'=>'
+t_OP_LOGIC = r'&&|\|\||!'
+t_OP_NULLABLE = r'\?'
+t_OP_RELACIONAL = r'==|!=|>=|<=|>|<'
 
-# --- INICIO APORTE DANIEL CORTEZ ---
-# Operador de Funciones (Lambda)
-t_FLECHA = r'=>'
-# Operadores relacionales (Importante: los dobles ==, >= van primero que los simples >)
-t_RELACIONAL = r'==|!=|>=|<=|>|<'
-# Operadores Lógicos (Escapamos el pipe \| porque es especial en regex)
-t_LOGICO = r'&&|\|\||!'
-# Manejo de nulos (Escapamos la interrogación \?)
-t_NULO = r'\?'
-# --- FIN APORTE DANIEL CORTEZ ---
-
-# [AQUÍ ALEX AÑADIRÁ SUS SÍMBOLOS COMO t_ARITMETICO]
-
-
-# --- INICIO APORTE ALEX NIEVES ---
-# Delimitador base
 t_DELIMITER = r'[\(\);\{\}\[\],:\.]'
-# --- FIN APORTE ALEX NIEVES ---
 
+def t_ignore_comment(t):
+    # Reconoce comentarios de una y múltiples líneas
+    r'(//.*)|(/\*(.|\n)*?\*/)'
+    t.lexer.lineno += t.value.count('\n')
+    pass
 
-# 4. FUNCIONES DE EVALUACIÓN COMPLEJA
-
-# --- INICIO APORTE SOFIA IZAGUIRRE ---
-# Función para Identificadores y filtrado de Palabras Reservadas
-def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z0-9_]*'
-    # Verifica si el texto ingresado es una palabra reservada o una variable normal
-    t.type = data_types.get(t.value, keywords.get(t.value, 'ID')) 
-    return t
-# --- FIN APORTE SOFIA IZAGUIRRE ---
-
-# --- INICIO APORTE DANIEL CORTEZ ---
-# Reconocer números decimales (ej. 12.5)
-def t_DECIMAL(t):
+# --- DANIEL CORTEZ ---
+def t_VAL_DOUBLE(t):
+    # Reconoce numeros decimales
     r'\d+\.\d+'
     t.value = float(t.value)
     return t
-# --- FIN APORTE DANIEL CORTEZ ---
 
-# --- INICIO APORTE DANIEL CORTEZ ---
-# Función robusta para Reglas de Comentarios (De una y múltiples líneas)
-def t_COMMENT(t):
-    r'(//.*)|(/\*(.|\n)*?\*/)'
-    # Contamos los saltos de línea dentro del bloque /* */ para no desajustar el contador de errores
-    t.lexer.lineno += t.value.count('\n')
-    pass # Usamos pass para que el lexer lo ignore completamente y no lo meta en el log (talvez podriamos quitarlo despues)
-# --- FIN APORTE DANIEL CORTEZ ---
-
-# --- INICIO APORTE SOFIA IZAGUIRRE ---
-# Reconocer números enteros (ej. 5)
-def t_ENTERO(t):
+# --- SOFIA IZAGUIRRE ---
+def t_VAL_INT(t):
+    # Reconoce números enteros
     r'\d+'
     t.value = int(t.value)
     return t
-# --- FIN APORTE SOFIA IZAGUIRRE ---
 
-# Regla OBLIGATORIA para contar los saltos de línea
+# --- SOFIA IZAGUIRRE ---
+def t_ID(t):
+    # Reconoce palabras reservadas o identificadores
+    r'[a-zA-Z_]\w*'
+    
+    t.type = data_types.get(t.value, keywords.get(t.value, 'ID'))
+    
+    return t
+
 def t_newline(t):
+    # Reconoce los saltos de línea
     r'\n+'
     t.lexer.lineno += len(t.value)
 
-# Regla para manejar caracteres no reconocidos
 def t_error(t):
     global log
-    print(f"Caracter ilegal: '{t.value[0]}' en la linea {t.lineno}")
-    log += f"Caracter ilegal: '{t.value[0]}' en la linea {t.lineno}\n"
+    message = f'Caracter ilegal: \'{t.value[0]}\' en la linea {t.lineno}'
+    print(message)
+    log += message + '\n'
     t.lexer.skip(1)
 
 # Construcción del lexer
