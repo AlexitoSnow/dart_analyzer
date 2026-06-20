@@ -1,45 +1,65 @@
-/*
-  Prueba Léxica Conjunta
-  Valida los aportes de Sofía Izaguirre y Daniel Cortez
+/**
+ * Prueba de código Grupal
+ * Snippet conjunto que integra todas las posibilidades y reglas léxicas 
+ * de Alexander, Sofía y Daniel.
 */
-
 void main() {
-  // 1. Tipos de datos, variables y constantes (Sofía y Daniel)
-  int edadMascota = 5;
-  double peso = 12.5;
-  bool estaVacunado = true;
-  var enTratamiento = false;
+  // Sofia: variables, constantes, int, Map, asignación, estructuras de control, print
+  var variable = 100;
+  final int miEntero = 50;
+  const bool flag = true;
+  Map<String, int>? mapa;
   
-  final int idConsulta = 1024;
-  const double costoBase = 15.0;
-
-  Map registroClinico;
-  Set vacunasAplicadas;
-
-  // 2. Manejo de nulos (Daniel) y Asignación (Sofía)
-  int? proximaCita; 
-
-  // 3. Estructuras de control (Sofía) y Operadores (Daniel)
-  if (edadMascota >= 5 && peso != 0.0) {
-    print(true);
-  } else {
-    print(false);
+  // Daniel: double, bool, Set, nulabilidad, operadores lógicos y relacionales, operador flecha
+  double decimal = 3.14;
+  bool esFalso = false;
+  Set<double>? conjunto;
+  int? numeroNulable = null;
+  bool condicion = (decimal >= 3.0) && (decimal <= 4.0) || !esFalso;
+  int obtenerValor() => 10;
+  
+  // Alexander: String, List, null, operadores aritméticos, relacionales < >, strings y delimitadores
+  String cadenaDoble = "Texto en comillas dobles";
+  String cadenaSimple = 'Texto en comillas simples';
+  List<int> miLista = [1, 2, 3];
+  var nulo = null;
+  int calculo = (10 + 5) * 2 / 3 - 1 % 2;
+  variable++;
+  variable--;
+  
+  if (variable < 200) {
+    // menor
   }
-
-  while (peso < 20.0 || !estaVacunado) {
-    break;
+  if (variable > 50) {
+    // mayor
   }
-
-  for (int i = 0; i <= 3; i = i + 1) {
-    // Revisión de rutina
+  
+  switch (variable) {
+    case 100:
+      print(cadenaDoble);
+      break;
+    default:
+      print(cadenaSimple);
+      break;
   }
-
-  switch (idConsulta) {
-    // Selección de casos
+  
+  for (int i = 0; i < 5; i++) {
+    while (variable > 90) {
+      break;
+    }
   }
-
-  // 4. Operador Flecha (Daniel) y retorno (Sofía)
-  int calcularDosis() => 2;
   
   return;
+}
+
+class ParentClass {
+  int method() {}
+}
+
+// 'extends' no esta en las keywords, se espera que se lea como ID
+class SonClass extends ParentClass {
+  // '@override' no esta en las keywords, se espera que 'override' se lea como ID
+  // y que '@' se lea como un error intencional para probar los casos de error
+  @override
+  int method() {}
 }
