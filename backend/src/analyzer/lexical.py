@@ -1,6 +1,5 @@
 import ply.lex as lex
 
-# 1. DICCIONARIO DE PALABRAS RESERVADAS
 data_types = {
     # --- SOFIA IZAGUIRRE ---
     'int': 'DT_INT',
@@ -41,7 +40,6 @@ keywords = {
 }
 
 
-# 2. TUPLA DE TOKENS
 tokens = (
     # --- SOFIA IZAGUIRRE ---
     'ID',
@@ -84,7 +82,6 @@ log = ''
 
 # Ignorar espacios y tabulaciones
 t_ignore = ' \t'
-
 
 # --- SOFIA IZAGUIRRE ---
 t_OP_ASSIGN = r'='
@@ -135,7 +132,7 @@ def t_VAL_INT(t):
 def t_VAL_STRING(t):
     # Reconoce cadenas de texto
     r'"([^\\]|\\.)*?"|\'([^\\]|\\.)*?\''
-    t.value = t.value[1:-1] # Quitar comillas de los extremos
+    t.value = t.value[1:-1]
     return t
 
 # --- SOFIA IZAGUIRRE ---
@@ -159,7 +156,6 @@ def t_error(t):
     log += message + '\n'
     t.lexer.skip(1)
 
-# Construcción del lexer
 lexer = lex.lex()
 
 def lexical_analysis(data: str) -> str:
