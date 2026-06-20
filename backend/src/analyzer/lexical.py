@@ -1,29 +1,40 @@
 import ply.lex as lex
 
 # 1. DICCIONARIO DE PALABRAS RESERVADAS
-reservadas = {
-    # --- INICIO APORTE SOFIA IZAGUIRRE ---
-    'var': 'VAR', 'final': 'FINAL', 'const': 'CONST',
-    'if': 'IF', 'else': 'ELSE', 'for': 'FOR', 'while': 'WHILE',
-    'return': 'RETURN', 'print': 'PRINT', 'switch': 'SWITCH',
-    'break': 'BREAK', 'void': 'VOID', 'true': 'TRUE', 'false': 'FALSE',
-    'int': 'INT', 'Map': 'MAP',
-    # --- FIN APORTE SOFIA IZAGUIRRE ---
+data_types = {
+    # --- SOFIA IZAGUIRRE ---
+    'int': 'DT_INT',
+    'Map': 'DT_MAP',
 
-    # --- INICIO APORTE DANIEL CORTEZ ---
-    'double': 'DOUBLE',
-    'bool': 'BOOL',
-    'Set': 'SET'
-    # --- FIN APORTE DANIEL CORTEZ ---
-    
-    # [AQUÍ ALEX AÑADIRÁ 'String' y 'List']
+    # --- DANIEL CORTEZ ---
+    'double': 'DT_DOUBLE',
+    'bool': 'DT_BOOL',
+    'Set': 'DT_SET',
+}
+
+keywords = {
+    # --- SOFIA IZAGUIRRE ---
+    'var': 'KW_VAR',
+    'final': 'KW_FINAL',
+    'const': 'KW_CONST',
+    'true': 'KW_TRUE',
+    'false': 'KW_FALSE',
+    'if': 'KW_IF',
+    'else': 'KW_ELSE',
+    'for': 'KW_FOR',
+    'while': 'KW_WHILE',
+    'return': 'KW_RETURN',
+    'print': 'KW_PRINT',
+    'switch': 'KW_SWITCH',
+    'break': 'KW_BREAK',
+    'void': 'KW_VOID',
 }
 
 
 # 2. TUPLA DE TOKENS
 tokens = (
     'DELIMITER',
-    # --- INICIO APORTE SOFIA IZAGUIRRE ---
+    # --- SOFIA IZAGUIRRE ---
     'ID', 'ASSIGN', 'ENTERO',
     # --- FIN APORTE SOFIA IZAGUIRRE ---
     
@@ -32,7 +43,7 @@ tokens = (
     # --- FIN APORTE DANIEL CORTEZ ---
     
     # [AQUÍ ALEX AÑADIRÁ SUS TOKENS COMO 'ARITMETICO']
-) + tuple(reservadas.values())
+) + tuple(data_types.values()) + tuple(keywords.values())
 
 log = ''
 
@@ -74,7 +85,7 @@ t_DELIMITER = r'[\(\);\{\}\[\],:\.]'
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
     # Verifica si el texto ingresado es una palabra reservada o una variable normal
-    t.type = reservadas.get(t.value, 'ID') 
+    t.type = data_types.get(t.value, keywords.get(t.value, 'ID')) 
     return t
 # --- FIN APORTE SOFIA IZAGUIRRE ---
 
