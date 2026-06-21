@@ -46,7 +46,6 @@ tokens = (
     'OP_ASSIGN',
     
     'VAL_INT',
-    'VAL_MAP',
     
     # --- DANIEL CORTEZ ---
     'OP_ARROW',
@@ -56,7 +55,6 @@ tokens = (
 
     'VAL_DOUBLE',
     'VAL_BOOL',
-    'VAL_SET',
     
     # --- ALEXANDER NIEVES ---
     'OP_ARITHMETIC',
@@ -64,7 +62,6 @@ tokens = (
     'OP_GREATHER',
     
     'VAL_STRING',
-    'VAL_LIST',
     
     'DEL_LBRACE',
     'DEL_RBRACE',
