@@ -1,5 +1,3 @@
-import ply.lex as lex
-
 data_types = {
     # --- SOFIA IZAGUIRRE ---
     'int': 'DT_INT',
@@ -58,8 +56,12 @@ tokens = (
     
     # --- ALEXANDER NIEVES ---
     'OP_ARITHMETIC',
-    'OP_LESS',
+    'OP_DECREMENT',
     'OP_GREATHER',
+    'OP_INCREMENT',
+    'OP_LESS',
+    'OP_SINGLE_INCREMENT',
+    'OP_SINGLE_DECREMENT',
     
     'VAL_STRING',
     
@@ -101,9 +103,13 @@ t_DEL_SEMICOLON= r';'
 t_DEL_COLON    = r':'
 t_DEL_DOT      = r'\.'
 
-t_OP_ARITHMETIC = r'\+\+|--|\+|-|\*|/|%'
-t_OP_LESS = r'<'
+t_OP_ARITHMETIC = r'\+|-|\*|/|%'
+t_OP_DECREMENT = r'-='
 t_OP_GREATHER = r'>'
+t_OP_INCREMENT = r'\+='
+t_OP_LESS = r'<'
+t_OP_SINGLE_DECREMENT = r'--'
+t_OP_SINGLE_INCREMENT = r'\+\+'
 
 def t_ignore_comment(t):
     # Reconoce comentarios de una y múltiples líneas
@@ -153,12 +159,9 @@ def t_error(t):
     log += message + '\n'
     t.lexer.skip(1)
 
-lexer = lex.lex()
 
-def lexical_analysis(data: str) -> str:
+def lexical_analysis(lexer) -> str:
     global log
-    
-    lexer.input(data)
 
     while True:
         token = lexer.token()
