@@ -6,9 +6,9 @@
 */
 void main() {
   String mensaje = "Hola Mundo";
-  String mensaje2 = 'Hola de nuevo';
+  final mensaje2 = 'Hola de nuevo';
   List<int> lista = [1, 2, 3];
-  var valorNulo = null;
+  var valorNulo? = null;
   int a = 10;
   int b = 5;
   int c = a + b - (a * b) / (a % b);
