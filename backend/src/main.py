@@ -1,7 +1,8 @@
-from analyzer.lexical import lexical_analysis
-import sys
-from file.write import write_log
+from analyzer import analyzer
+from file.write import write_lexical_log, write_syntactic_log
 from file.read import read_file
+
+import sys
 
 print("Dart Analyzer")
 
@@ -9,7 +10,6 @@ try:
     author = int(sys.argv[1])
     filename = sys.argv[2]
     code = read_file(filename)
-    log = lexical_analysis(code)
-    write_log(author, log)
+    analyzer.execute_analysis(author, code)
 except Exception as e:
     sys.stderr.write(str(e) + '\n')
