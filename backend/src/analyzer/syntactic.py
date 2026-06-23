@@ -21,7 +21,8 @@ def p_instruction(p):
 
 def p_variable_declaration(p):
     '''variable_declaration : vd_inmutability
-                            | vd_nullability'''
+                            | vd_nullability
+                            | vd_inference'''
     # TODO: todas las funciones de declaracion de variables que agreguen listenlas despues del punto, separadas en multilinea con | al inicio
     p[0] = p[1]
 
@@ -43,7 +44,8 @@ def p_data_structures(p):
     p[0] = p[1]
 
 def p_function_declarations(p):
-    '''function_declarations : fd_void'''
+    '''function_declarations : fd_void
+                            | fd_return'''
     # TODO: todas las funciones de declaracion de funciones que agreguen listenlas despues del punto, separadas en multilinea con | al inicio
     p[0] = p[1]
 
@@ -73,6 +75,11 @@ def p_vd_nullability(p):
 
 # --- Sofia Izaguirre ---
 # Declaracion de variable Forma 1
+def p_vd_inference(p):
+    '''vd_inference : KW_VAR ID OP_ASSIGN valor DEL_SEMICOLON
+                    | KW_VAR ID OP_ASSIGN arithmetic_expression DEL_SEMICOLON'''
+    global log
+    log += f"Declaracion de variable: Inferencia de tipo '{p[2]}'\n"
 
 # --- Daniel Cortez ---
 # Declaracion de variable Forma 2
@@ -89,13 +96,24 @@ def p_term(p):
             | VAL_DOUBLE'''
     p[0] = p[1]
 
-# --- Daniel Cortez ---
+# --- Sofia Izaguirre ---
 # Expresiones booleanas
+def p_boolean_expression(p):
+    '''boolean_expression : valor OP_RELACIONAL valor
+                          | boolean_expression OP_LOGIC boolean_expression
+                          | KW_TRUE
+                          | KW_FALSE'''
+    p[0] = p[1]
 
 # --- Sofia Izaguirre ---
 def p_ce_if_else(p):
-    '''ce_if_else : '''
-    p[0] = p[1]
+    '''ce_if_else : KW_IF DEL_LPAREN boolean_expression DEL_RPAREN DEL_LBRACE body DEL_RBRACE
+                  | KW_IF DEL_LPAREN boolean_expression DEL_RPAREN DEL_LBRACE body DEL_RBRACE KW_ELSE DEL_LBRACE body DEL_RBRACE'''
+    global log
+    if len(p) == 8:
+        log += "Estructura de control: IF\n"
+    else:
+        log += "Estructura de control: IF-ELSE\n"
 
 # --- Daniel Cortez ---
 def p_ce_while(p):
@@ -122,8 +140,21 @@ def p_for_step(p):
                 | ID OP_INCREMENT valor'''
 
 # --- Sofia Izaguirre ---
+
 def p_de_map(p):
-    '''de_map : '''
+    '''de_map : DT_MAP OP_LESS data_type DEL_COMMA data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACE map_elements DEL_RBRACE DEL_SEMICOLON
+              | DT_MAP ID OP_ASSIGN DEL_LBRACE map_elements DEL_RBRACE DEL_SEMICOLON'''
+    global log
+    if len(p) == 13:
+        log += f"Declaracion de estructura: Map '{p[7]}'\n"
+    else:
+        log += f"Declaracion de estructura: Map '{p[2]}'\n"
+
+def p_map_elements(p):
+    '''map_elements : valor DEL_COLON valor
+                    | valor DEL_COLON valor DEL_COMMA map_elements
+                    | empty'''
+    pass
 
 # --- Daniel Cortez ---
 def p_de_set(p):
@@ -150,6 +181,11 @@ def p_list_content(p):
 
 # --- Sofia Izaguirre ---
 # Declaracion de funcion estandar con retorno
+def p_fd_return(p):
+    '''fd_return : data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body KW_RETURN valor DEL_SEMICOLON DEL_RBRACE
+                 | data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body KW_RETURN arithmetic_expression DEL_SEMICOLON DEL_RBRACE'''
+    global log
+    log += f"Declaracion de funcion: Retorno '{p[2]}'\n"
 
 # --- Daniel Cortez ---
 # Funcion lambda/flecha
