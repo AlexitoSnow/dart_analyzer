@@ -67,7 +67,6 @@ def p_class_body(p):
                   | empty'''
     pass
 
-
 # --- Daniel Cortez ---
 def p_input_output(p):
     '''input_output : io_print
@@ -81,7 +80,7 @@ def p_vd_inmutability(p):
                        | KW_CONST ID OP_ASSIGN valor DEL_SEMICOLON
                        | KW_CONST data_type ID OP_ASSIGN valor DEL_SEMICOLON'''
     global log
-    # Si tiene 6 elementos, el ID está en la posición 2, si tiene 7, está en la 3
+    # Ajuste de índice por tipos de datos opcionales
     nombre_var = p[2] if len(p) == 6 else p[3]
     message = f"Declaracion de variable: Inmutabilidad '{nombre_var}'"
     log += message + '\n'
@@ -181,6 +180,23 @@ def p_for_step(p):
                 | ID OP_DECREMENT valor
                 | ID OP_INCREMENT valor'''
 
+# --- Alexander Nieves ---
+def p_ce_switch(p):
+    '''ce_switch : KW_SWITCH DEL_LPAREN ID DEL_RPAREN DEL_LBRACE switch_cases DEL_RBRACE'''
+    global log
+    log += "Estructura de control: Switch\n"
+
+def p_switch_cases(p):
+    '''switch_cases : switch_case
+                    | switch_cases switch_case
+                    | empty'''
+    pass
+
+def p_switch_case(p):
+    '''switch_case : KW_CASE valor DEL_COLON body
+                   | KW_DEFAULT DEL_COLON body'''
+    pass
+
 # --- Sofia Izaguirre ---
 def p_de_map(p):
     '''de_map : DT_MAP OP_LESS data_type DEL_COMMA data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACE map_elements DEL_RBRACE DEL_SEMICOLON
@@ -235,7 +251,8 @@ def p_list_content(p):
 # Declaracion de funcion estandar con retorno
 def p_fd_return(p):
     '''fd_return : data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body KW_RETURN valor DEL_SEMICOLON DEL_RBRACE
-                 | data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body KW_RETURN arithmetic_expression DEL_SEMICOLON DEL_RBRACE'''
+                 | data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body KW_RETURN arithmetic_expression DEL_SEMICOLON DEL_RBRACE
+                 | data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
     global log
     log += f"Declaracion de funcion: Retorno '{p[2]}'\n"
 
@@ -248,6 +265,7 @@ def p_fd_lambda(p):
     global log
     log += f"Declaracion de funcion: Lambda '{p[2]}'\n"
 
+# --- Daniel Cortez ---
 # Impresión y Solicitud de datos
 def p_io_print(p):
     '''io_print : KW_PRINT DEL_LPAREN print_content DEL_RPAREN DEL_SEMICOLON'''
