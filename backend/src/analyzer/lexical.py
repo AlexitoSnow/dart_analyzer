@@ -1,3 +1,5 @@
+import ply.lex as lex
+
 data_types = {
     # --- SOFIA IZAGUIRRE ---
     'int': 'DT_INT',
@@ -46,7 +48,7 @@ tokens = (
     'VAL_INT',
     
     # --- DANIEL CORTEZ ---
-    'OP_ARROW',
+    'OP_FLECHA',
     'OP_LOGIC',
     'OP_NULLABLE',
     'OP_RELACIONAL',
@@ -86,7 +88,7 @@ t_ignore = ' \t'
 t_OP_ASSIGN = r'='
 
 # --- DANIEL CORTEZ ---
-t_OP_ARROW = r'=>'
+t_OP_FLECHA = r'=>'
 t_OP_LOGIC = r'&&|\|\||!'
 t_OP_NULLABLE = r'\?'
 t_OP_RELACIONAL = r'==|!=|>=|<='
@@ -142,9 +144,7 @@ def t_VAL_STRING(t):
 def t_ID(t):
     # Reconoce palabras reservadas o identificadores
     r'[a-zA-Z_]\w*'
-    
     t.type = data_types.get(t.value, keywords.get(t.value, 'ID'))
-    
     return t
 
 def t_newline(t):
@@ -159,12 +159,14 @@ def t_error(t):
     log += message + '\n'
     t.lexer.skip(1)
 
+# Construcción del lexer
+lexer = lex.lex()
 
-def lexical_analysis(lexer) -> str:
+def lexical_analysis(lexer_instance) -> str:
     global log
 
     while True:
-        token = lexer.token()
+        token = lexer_instance.token()
         if not token:
             break
         log += str(token) + '\n'

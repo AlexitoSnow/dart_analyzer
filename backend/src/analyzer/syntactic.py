@@ -22,13 +22,13 @@ def p_instruction(p):
 def p_variable_declaration(p):
     '''variable_declaration : vd_inmutability
                             | vd_nullability
-                            | vd_inference'''
-    # TODO: todas las funciones de declaracion de variables que agreguen listenlas despues del punto, separadas en multilinea con | al inicio
+                            | vd_inference
+                            | vd_static'''
     p[0] = p[1]
 
 def p_expressions(p):
-    '''expressions : arithmetic_expression'''
-    # TODO: todas las funciones de expresiones que agreguen listenlas despues del punto, separadas en multilinea con | al inicio
+    '''expressions : arithmetic_expression
+                   | boolean_expression'''
     p[0] = p[1]
 
 def p_control_structures(p):
@@ -45,19 +45,20 @@ def p_data_structures(p):
 
 def p_function_declarations(p):
     '''function_declarations : fd_void
-                            | fd_return'''
-    # TODO: todas las funciones de declaracion de funciones que agreguen listenlas despues del punto, separadas en multilinea con | al inicio
+                            | fd_return
+                            | fd_lambda'''
     p[0] = p[1]
 
-# --- Quien le toque esta parte :D ---
+# --- Daniel Cortez ---
 def p_input_output(p):
-    '''input_output : '''
-    # TODO: todas las funciones de entrada y salida que agreguen listenlas despues del punto, separadas en multilinea con | al inicio
+    '''input_output : io_print
+                    | io_read'''
     p[0] = p[1]
 
 # --- Alexander Nieves ---
 def p_vd_inmutability(p):
-    '''vd_inmutability : KW_FINAL ID OP_ASSIGN valor DEL_SEMICOLON'''
+    '''vd_inmutability : KW_FINAL ID OP_ASSIGN valor DEL_SEMICOLON
+                       | KW_CONST ID OP_ASSIGN valor DEL_SEMICOLON'''
     global log
     message = f"Declaracion de variable: Inmutabilidad '{p[2]}'"
     log += message + '\n'
@@ -82,7 +83,13 @@ def p_vd_inference(p):
     log += f"Declaracion de variable: Inferencia de tipo '{p[2]}'\n"
 
 # --- Daniel Cortez ---
-# Declaracion de variable Forma 2
+# Declaracion de variable Forma 2 (Tipado Estático)
+def p_vd_static(p):
+    '''vd_static : data_type ID OP_ASSIGN valor DEL_SEMICOLON
+                 | data_type ID DEL_SEMICOLON
+                 | data_type ID OP_ASSIGN arithmetic_expression DEL_SEMICOLON'''
+    global log
+    log += f"Declaracion de variable: Tipado estatico '{p[2]}'\n"
 
 # --- Alexander Nieves ---
 def p_arithmetic_expression(p):
@@ -93,7 +100,8 @@ def p_arithmetic_expression(p):
 
 def p_term(p):
     '''term : VAL_INT
-            | VAL_DOUBLE'''
+            | VAL_DOUBLE
+            | ID'''
     p[0] = p[1]
 
 # --- Sofia Izaguirre ---
@@ -117,8 +125,9 @@ def p_ce_if_else(p):
 
 # --- Daniel Cortez ---
 def p_ce_while(p):
-    '''ce_while : '''
-    p[0] = p[1]
+    '''ce_while : KW_WHILE DEL_LPAREN boolean_expression DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
+    global log
+    log += "Estructura de control: While\n"
 
 # --- Alexander Nieves ---
 def p_ce_for(p):
@@ -158,7 +167,19 @@ def p_map_elements(p):
 
 # --- Daniel Cortez ---
 def p_de_set(p):
-    '''de_set : '''
+    '''de_set : DT_SET OP_LESS data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACE set_elements DEL_RBRACE DEL_SEMICOLON
+              | DT_SET ID OP_ASSIGN DEL_LBRACE set_elements DEL_RBRACE DEL_SEMICOLON'''
+    global log
+    if len(p) == 11:
+        log += f"Declaracion de estructura: Set '{p[5]}'\n"
+    else:
+        log += f"Declaracion de estructura: Set '{p[2]}'\n"
+
+def p_set_elements(p):
+    '''set_elements : valor
+                    | valor DEL_COMMA set_elements
+                    | empty'''
+    pass
 
 # --- Alexander Nieves ---
 def p_de_list(p):
@@ -189,6 +210,31 @@ def p_fd_return(p):
 
 # --- Daniel Cortez ---
 # Funcion lambda/flecha
+def p_fd_lambda(p):
+    '''fd_lambda : data_type ID DEL_LPAREN parameters DEL_RPAREN OP_FLECHA arithmetic_expression DEL_SEMICOLON
+                 | data_type ID DEL_LPAREN parameters DEL_RPAREN OP_FLECHA boolean_expression DEL_SEMICOLON
+                 | data_type ID DEL_LPAREN parameters DEL_RPAREN OP_FLECHA valor DEL_SEMICOLON'''
+    global log
+    log += f"Declaracion de funcion: Lambda '{p[2]}'\n"
+
+# Impresión y Solicitud de datos
+def p_io_print(p):
+    '''io_print : KW_PRINT DEL_LPAREN print_content DEL_RPAREN DEL_SEMICOLON'''
+    global log
+    log += "Impresion de datos: print\n"
+
+def p_print_content(p):
+    '''print_content : valor
+                     | ID
+                     | valor OP_ARITHMETIC ID
+                     | ID OP_ARITHMETIC ID'''
+    pass
+
+def p_io_read(p):
+    '''io_read : data_type OP_NULLABLE ID OP_ASSIGN ID DEL_DOT ID DEL_LPAREN DEL_RPAREN DEL_SEMICOLON'''
+    global log
+    log += f"Solicitud de datos: readLineSync a la variable '{p[3]}'\n"
+
 
 # --- Alexander Nieves ---
 def p_fd_void(p):
@@ -236,7 +282,8 @@ def p_valor(p):
              | VAL_DOUBLE
              | VAL_BOOL
              | VAL_STRING
-             | KW_NULL'''
+             | KW_NULL
+             | ID'''
     p[0] = p[1]
 
 def p_error(p):
