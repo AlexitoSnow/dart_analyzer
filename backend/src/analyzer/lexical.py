@@ -110,14 +110,21 @@ t_OP_DECREMENT = r'-='
 t_OP_GREATHER = r'>'
 t_OP_INCREMENT = r'\+='
 t_OP_LESS = r'<'
-t_OP_SINGLE_DECREMENT = r'--'
-t_OP_SINGLE_INCREMENT = r'\+\+'
 
 def t_ignore_comment(t):
     # Reconoce comentarios de una y múltiples líneas
     r'(//.*)|(/\*(.|\n)*?\*/)'
     t.lexer.lineno += t.value.count('\n')
     pass
+
+# Funciones para dar prioridad
+def t_OP_SINGLE_INCREMENT(t):
+    r'\+\+'
+    return t
+
+def t_OP_SINGLE_DECREMENT(t):
+    r'--'
+    return t
 
 # --- DANIEL CORTEZ ---
 def t_VAL_DOUBLE(t):

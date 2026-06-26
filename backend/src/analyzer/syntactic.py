@@ -14,6 +14,7 @@ def p_instruction(p):
                    | control_structures
                    | data_structures
                    | function_declarations
+                   | class_declaration
                    | input_output
                    | error DEL_SEMICOLON
                    | error DEL_RBRACE'''
@@ -28,13 +29,16 @@ def p_variable_declaration(p):
 
 def p_expressions(p):
     '''expressions : arithmetic_expression
-                   | boolean_expression'''
+                   | boolean_expression
+                   | ID OP_SINGLE_INCREMENT DEL_SEMICOLON
+                   | ID OP_SINGLE_DECREMENT DEL_SEMICOLON'''
     p[0] = p[1]
 
 def p_control_structures(p):
     '''control_structures : ce_if_else
                         | ce_while
-                        | ce_for'''
+                        | ce_for
+                        | ce_switch'''
     p[0] = p[1]
 
 def p_data_structures(p):
@@ -49,6 +53,21 @@ def p_function_declarations(p):
                             | fd_lambda'''
     p[0] = p[1]
 
+
+# --- NUEVO: Soporte para Clases ---
+def p_class_declaration(p):
+    '''class_declaration : KW_CLASS ID DEL_LBRACE class_body DEL_RBRACE
+                         | KW_CLASS ID ID ID DEL_LBRACE class_body DEL_RBRACE'''
+    global log
+    log += f"Declaracion de clase: '{p[2]}'\n"
+
+def p_class_body(p):
+    '''class_body : instruction
+                  | class_body instruction
+                  | empty'''
+    pass
+
+
 # --- Daniel Cortez ---
 def p_input_output(p):
     '''input_output : io_print
@@ -58,9 +77,13 @@ def p_input_output(p):
 # --- Alexander Nieves ---
 def p_vd_inmutability(p):
     '''vd_inmutability : KW_FINAL ID OP_ASSIGN valor DEL_SEMICOLON
-                       | KW_CONST ID OP_ASSIGN valor DEL_SEMICOLON'''
+                       | KW_FINAL data_type ID OP_ASSIGN valor DEL_SEMICOLON
+                       | KW_CONST ID OP_ASSIGN valor DEL_SEMICOLON
+                       | KW_CONST data_type ID OP_ASSIGN valor DEL_SEMICOLON'''
     global log
-    message = f"Declaracion de variable: Inmutabilidad '{p[2]}'"
+    # Si tiene 6 elementos, el ID está en la posición 2, si tiene 7, está en la 3
+    nombre_var = p[2] if len(p) == 6 else p[3]
+    message = f"Declaracion de variable: Inmutabilidad '{nombre_var}'"
     log += message + '\n'
 
 # --- Alexander Nieves ---
@@ -87,7 +110,8 @@ def p_vd_inference(p):
 def p_vd_static(p):
     '''vd_static : data_type ID OP_ASSIGN valor DEL_SEMICOLON
                  | data_type ID DEL_SEMICOLON
-                 | data_type ID OP_ASSIGN arithmetic_expression DEL_SEMICOLON'''
+                 | data_type ID OP_ASSIGN arithmetic_expression DEL_SEMICOLON
+                 | data_type ID OP_ASSIGN boolean_expression DEL_SEMICOLON'''
     global log
     log += f"Declaracion de variable: Tipado estatico '{p[2]}'\n"
 
@@ -108,7 +132,12 @@ def p_term(p):
 # Expresiones booleanas
 def p_boolean_expression(p):
     '''boolean_expression : valor OP_RELACIONAL valor
+                          | valor OP_LESS valor
+                          | valor OP_GREATHER valor
+                          | DEL_LPAREN boolean_expression DEL_RPAREN
                           | boolean_expression OP_LOGIC boolean_expression
+                          | OP_LOGIC boolean_expression
+                          | OP_LOGIC valor
                           | KW_TRUE
                           | KW_FALSE'''
     p[0] = p[1]
@@ -139,7 +168,11 @@ def p_ce_for(p):
 
 def p_for_condition(p):
     '''for_condition : ID OP_RELACIONAL valor
-                    | valor OP_RELACIONAL ID'''
+                    | valor OP_RELACIONAL ID
+                    | ID OP_LESS valor
+                    | valor OP_LESS ID
+                    | ID OP_GREATHER valor
+                    | valor OP_GREATHER ID'''
     p[0] = p[1]
 
 def p_for_step(p):
@@ -149,15 +182,14 @@ def p_for_step(p):
                 | ID OP_INCREMENT valor'''
 
 # --- Sofia Izaguirre ---
-
 def p_de_map(p):
     '''de_map : DT_MAP OP_LESS data_type DEL_COMMA data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACE map_elements DEL_RBRACE DEL_SEMICOLON
-              | DT_MAP ID OP_ASSIGN DEL_LBRACE map_elements DEL_RBRACE DEL_SEMICOLON'''
+              | DT_MAP ID OP_ASSIGN DEL_LBRACE map_elements DEL_RBRACE DEL_SEMICOLON
+              | DT_MAP OP_LESS data_type DEL_COMMA data_type OP_GREATHER OP_NULLABLE ID DEL_SEMICOLON
+              | DT_MAP OP_NULLABLE ID DEL_SEMICOLON'''
     global log
-    if len(p) == 13:
-        log += f"Declaracion de estructura: Map '{p[7]}'\n"
-    else:
-        log += f"Declaracion de estructura: Map '{p[2]}'\n"
+    nombre_var = p[7] if len(p) > 10 else p[2]
+    log += f"Declaracion de estructura: Map\n"
 
 def p_map_elements(p):
     '''map_elements : valor DEL_COLON valor
@@ -168,12 +200,11 @@ def p_map_elements(p):
 # --- Daniel Cortez ---
 def p_de_set(p):
     '''de_set : DT_SET OP_LESS data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACE set_elements DEL_RBRACE DEL_SEMICOLON
-              | DT_SET ID OP_ASSIGN DEL_LBRACE set_elements DEL_RBRACE DEL_SEMICOLON'''
+              | DT_SET ID OP_ASSIGN DEL_LBRACE set_elements DEL_RBRACE DEL_SEMICOLON
+              | DT_SET OP_LESS data_type OP_GREATHER OP_NULLABLE ID DEL_SEMICOLON
+              | DT_SET OP_NULLABLE ID DEL_SEMICOLON'''
     global log
-    if len(p) == 11:
-        log += f"Declaracion de estructura: Set '{p[5]}'\n"
-    else:
-        log += f"Declaracion de estructura: Set '{p[2]}'\n"
+    log += f"Declaracion de estructura: Set\n"
 
 def p_set_elements(p):
     '''set_elements : valor
@@ -257,6 +288,8 @@ def p_parameter(p):
 
 def p_body(p):
     '''body : instruction
+            | KW_BREAK DEL_SEMICOLON
+            | KW_RETURN DEL_SEMICOLON
             | body instruction
             | empty'''
     p[0] = p[1]
@@ -283,6 +316,8 @@ def p_valor(p):
              | VAL_BOOL
              | VAL_STRING
              | KW_NULL
+             | KW_TRUE
+             | KW_FALSE
              | ID'''
     p[0] = p[1]
 
