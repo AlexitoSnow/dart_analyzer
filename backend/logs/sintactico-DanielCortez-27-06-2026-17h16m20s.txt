@@ -1,8 +1,0 @@
-Declaracion de variable: Tipado estatico 'decimal'
-Declaracion de variable: Tipado estatico 'bandera'
-Declaracion de estructura: Set
-Declaracion de variable nulable: 'valorNulable'
-Declaracion de variable: Tipado estatico 'resultado'
-Declaracion de funcion: Lambda 'calcular'
-Declaracion de funcion: Void 'main'
-

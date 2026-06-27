@@ -1,0 +1,19 @@
+Declaracion de funcion: Lambda 'obtenerGravedad'
+Declaracion de funcion: Lambda 'esMayorDeEdad'
+Error Sintactico: Estructura no valida cerca de ';' en la linea 8
+Declaracion de variable: Tipado estatico 'cantidadDeModulos'
+Declaracion de variable: Tipado estatico 'precioFinal'
+Declaracion de variable nulable con valor: 'estadoNulable' = null
+Declaracion de variable nulable: 'nombreUsuario'
+Declaracion de estructura: Set
+Declaracion de estructura: Set
+Declaracion de estructura: Set
+Declaracion de variable: Tipado estatico 'ejecutando'
+Impresion de datos: print
+Impresion de datos: print
+Estructura de control: While
+Error Sintactico: Estructura no valida cerca de 'ejecutando' en la linea 29
+Declaracion de funcion: Void 'main'
+Solicitud de datos: readLineSync a la variable 'entrada'
+Error Sintactico: Estructura no valida cerca de '}' en la linea 34
+
