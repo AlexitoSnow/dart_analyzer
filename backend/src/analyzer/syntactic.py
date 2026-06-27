@@ -3,7 +3,9 @@ from .lexical import tokens
 
 log = ''
 
-# --- Alexander Nieves ---
+# ==========================================
+# --- ESTRUCTURA BASE (COLABORATIVO) ---
+# ==========================================
 def p_programa(p):
     '''programa : instruction
                 | programa instruction'''
@@ -20,6 +22,7 @@ def p_instruction(p):
                    | KW_RETURN DEL_SEMICOLON
                    | KW_RETURN arithmetic_expression DEL_SEMICOLON
                    | KW_RETURN boolean_expression DEL_SEMICOLON
+                   | KW_RETURN valor DEL_SEMICOLON
                    | ID instruction
                    | error DEL_SEMICOLON
                    | error DEL_RBRACE'''
@@ -58,247 +61,9 @@ def p_function_declarations(p):
                             | fd_lambda'''
     p[0] = p[1]
 
-def p_class_declaration(p):
-    '''class_declaration : KW_CLASS ID DEL_LBRACE class_body DEL_RBRACE
-                         | KW_CLASS ID ID ID DEL_LBRACE class_body DEL_RBRACE'''
-    global log
-    log += f"Declaracion de clase: '{p[2]}'\n"
-
-def p_class_body(p):
-    '''class_body : instructions
-                  | empty'''
-    pass
-
-# --- Daniel Cortez ---
 def p_input_output(p):
     '''input_output : io_print
                     | io_read'''
-    p[0] = p[1]
-
-# --- Alexander Nieves ---
-def p_vd_inmutability(p):
-    '''vd_inmutability : KW_FINAL ID OP_ASSIGN valor DEL_SEMICOLON
-                       | KW_FINAL data_type ID OP_ASSIGN valor DEL_SEMICOLON
-                       | KW_CONST ID OP_ASSIGN valor DEL_SEMICOLON
-                       | KW_CONST data_type ID OP_ASSIGN valor DEL_SEMICOLON'''
-    global log
-    # Ajuste de índice por tipos de datos opcionales
-    nombre_var = p[2] if len(p) == 6 else p[3]
-    message = f"Declaracion de variable: Inmutabilidad '{nombre_var}'"
-    log += message + '\n'
-
-# --- Alexander Nieves ---
-def p_vd_nullability(p):
-    '''vd_nullability : data_type OP_NULLABLE ID DEL_SEMICOLON
-                      | data_type OP_NULLABLE ID OP_ASSIGN valor DEL_SEMICOLON'''
-    global log
-    if len(p) == 5:
-        message = f"Declaracion de variable nulable: '{p[3]}'"
-    else:
-        message = f"Declaracion de variable nulable con valor: '{p[3]}' = {p[5]}"
-    log += message + '\n'
-
-# --- Sofia Izaguirre ---
-# Declaracion de variable Forma 1
-def p_vd_inference(p):
-    '''vd_inference : KW_VAR ID OP_ASSIGN valor DEL_SEMICOLON
-                    | KW_VAR ID OP_ASSIGN arithmetic_expression DEL_SEMICOLON'''
-    global log
-    log += f"Declaracion de variable: Inferencia de tipo '{p[2]}'\n"
-
-# --- Daniel Cortez ---
-# Declaracion de variable Forma 2 (Tipado Estático)
-def p_vd_static(p):
-    '''vd_static : data_type ID OP_ASSIGN valor DEL_SEMICOLON
-                 | data_type ID DEL_SEMICOLON
-                 | data_type ID OP_ASSIGN arithmetic_expression DEL_SEMICOLON
-                 | data_type ID OP_ASSIGN boolean_expression DEL_SEMICOLON'''
-    global log
-    log += f"Declaracion de variable: Tipado estatico '{p[2]}'\n"
-
-# --- Alexander Nieves ---
-def p_arithmetic_expression(p):
-    '''arithmetic_expression : term OP_ARITHMETIC term
-                              | DEL_LPAREN arithmetic_expression DEL_RPAREN
-                              | arithmetic_expression OP_ARITHMETIC term'''
-    p[0] = p[1]
-
-def p_term(p):
-    '''term : VAL_INT
-            | VAL_DOUBLE
-            | ID'''
-    p[0] = p[1]
-
-# --- Sofia Izaguirre ---
-# Expresiones booleanas
-def p_boolean_expression(p):
-    '''boolean_expression : valor OP_RELACIONAL valor
-                          | valor OP_LESS valor
-                          | valor OP_GREATHER valor
-                          | DEL_LPAREN boolean_expression DEL_RPAREN
-                          | boolean_expression OP_LOGIC boolean_expression
-                          | OP_LOGIC boolean_expression
-                          | OP_LOGIC valor
-                          | KW_TRUE
-                          | KW_FALSE'''
-    p[0] = p[1]
-
-# --- Sofia Izaguirre ---
-def p_ce_if_else(p):
-    '''ce_if_else : KW_IF DEL_LPAREN boolean_expression DEL_RPAREN DEL_LBRACE body DEL_RBRACE
-                  | KW_IF DEL_LPAREN boolean_expression DEL_RPAREN DEL_LBRACE body DEL_RBRACE KW_ELSE DEL_LBRACE body DEL_RBRACE'''
-    global log
-    if len(p) == 8:
-        log += "Estructura de control: IF\n"
-    else:
-        log += "Estructura de control: IF-ELSE\n"
-
-# --- Daniel Cortez ---
-def p_ce_while(p):
-    '''ce_while : KW_WHILE DEL_LPAREN boolean_expression DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
-    global log
-    log += "Estructura de control: While\n"
-
-# --- Alexander Nieves ---
-def p_ce_for(p):
-    '''ce_for : KW_FOR DEL_LPAREN data_type ID OP_ASSIGN valor DEL_SEMICOLON for_condition DEL_SEMICOLON for_step DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
-    global log
-    message = f"Estructura de control: For"
-    log += message + '\n'
-    p[0] = p[1]
-
-def p_for_condition(p):
-    '''for_condition : ID OP_RELACIONAL valor
-                    | valor OP_RELACIONAL ID
-                    | ID OP_LESS valor
-                    | valor OP_LESS ID
-                    | ID OP_GREATHER valor
-                    | valor OP_GREATHER ID'''
-    p[0] = p[1]
-
-def p_for_step(p):
-    '''for_step : ID OP_SINGLE_DECREMENT
-                | ID OP_SINGLE_INCREMENT
-                | ID OP_DECREMENT valor
-                | ID OP_INCREMENT valor'''
-
-# --- Alexander Nieves ---
-def p_ce_switch(p):
-    '''ce_switch : KW_SWITCH DEL_LPAREN ID DEL_RPAREN DEL_LBRACE switch_cases DEL_RBRACE'''
-    global log
-    log += "Estructura de control: Switch\n"
-
-def p_switch_cases(p):
-    '''switch_cases : switch_case
-                    | switch_cases switch_case
-                    | empty'''
-    pass
-
-def p_switch_case(p):
-    '''switch_case : KW_CASE valor DEL_COLON body
-                   | KW_DEFAULT DEL_COLON body'''
-    pass
-
-# --- Sofia Izaguirre ---
-def p_de_map(p):
-    '''de_map : DT_MAP OP_LESS data_type DEL_COMMA data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACE map_elements DEL_RBRACE DEL_SEMICOLON
-              | DT_MAP ID OP_ASSIGN DEL_LBRACE map_elements DEL_RBRACE DEL_SEMICOLON
-              | DT_MAP OP_LESS data_type DEL_COMMA data_type OP_GREATHER OP_NULLABLE ID DEL_SEMICOLON
-              | DT_MAP OP_NULLABLE ID DEL_SEMICOLON'''
-    global log
-    log += f"Declaracion de estructura: Map\n"
-
-def p_map_elements(p):
-    '''map_elements : valor DEL_COLON valor
-                    | valor DEL_COLON valor DEL_COMMA map_elements
-                    | empty'''
-    pass
-
-# --- Daniel Cortez ---
-def p_de_set(p):
-    '''de_set : DT_SET OP_LESS data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACE set_elements DEL_RBRACE DEL_SEMICOLON
-              | DT_SET ID OP_ASSIGN DEL_LBRACE set_elements DEL_RBRACE DEL_SEMICOLON
-              | DT_SET OP_LESS data_type OP_GREATHER OP_NULLABLE ID DEL_SEMICOLON
-              | DT_SET OP_NULLABLE ID DEL_SEMICOLON'''
-    global log
-    log += f"Declaracion de estructura: Set\n"
-
-def p_set_elements(p):
-    '''set_elements : valor
-                    | valor DEL_COMMA set_elements
-                    | empty'''
-    pass
-
-# --- Alexander Nieves ---
-def p_de_list(p):
-    '''de_list : DT_LIST ID OP_ASSIGN DEL_LBRACKET list_content DEL_RBRACKET DEL_SEMICOLON
-                | DT_LIST ID OP_ASSIGN DEL_LBRACKET DEL_RBRACKET DEL_SEMICOLON
-                | DT_LIST OP_LESS data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACKET list_content DEL_RBRACKET DEL_SEMICOLON
-                | DT_LIST OP_LESS data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACKET DEL_RBRACKET DEL_SEMICOLON'''
-    global log
-    if p[2] == '<':
-        message = f"Declaracion de estructura: List '{p[5]}'"
-    else:
-        message = f"Declaracion de estructura: List '{p[2]}'"
-    log += message + '\n'
-    p[0] = p[1]
-
-def p_list_content(p):
-    '''list_content : valor
-                    | list_content DEL_COMMA valor'''
-    p[0] = p[1]
-
-# --- Sofia Izaguirre ---
-# Declaracion de funcion estandar con retorno
-def p_fd_return(p):
-    '''fd_return : data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
-    global log
-    log += f"Declaracion de funcion: Retorno '{p[2]}'\n"
-
-# --- Daniel Cortez ---
-# Funcion lambda/flecha
-def p_fd_lambda(p):
-    '''fd_lambda : data_type ID DEL_LPAREN parameters DEL_RPAREN OP_FLECHA arithmetic_expression DEL_SEMICOLON
-                 | data_type ID DEL_LPAREN parameters DEL_RPAREN OP_FLECHA boolean_expression DEL_SEMICOLON
-                 | data_type ID DEL_LPAREN parameters DEL_RPAREN OP_FLECHA valor DEL_SEMICOLON'''
-    global log
-    log += f"Declaracion de funcion: Lambda '{p[2]}'\n"
-
-# --- Daniel Cortez ---
-# Impresión y Solicitud de datos
-def p_io_print(p):
-    '''io_print : KW_PRINT DEL_LPAREN print_content DEL_RPAREN DEL_SEMICOLON'''
-    global log
-    log += "Impresion de datos: print\n"
-
-def p_print_content(p):
-    '''print_content : arithmetic_expression
-                     | boolean_expression
-                     | valor'''
-    pass
-
-def p_io_read(p):
-    '''io_read : data_type OP_NULLABLE ID OP_ASSIGN ID DEL_DOT ID DEL_LPAREN DEL_RPAREN DEL_SEMICOLON'''
-    global log
-    log += f"Solicitud de datos: readLineSync a la variable '{p[3]}'\n"
-
-# --- Alexander Nieves ---
-def p_fd_void(p):
-    '''fd_void : KW_VOID ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
-    global log
-    message = f"Declaracion de funcion: Void '{p[2]}'"
-    log += message + '\n'
-    p[0] = p[1]
-
-def p_parameters(p):
-    '''parameters : parameter
-                  | parameters DEL_COMMA parameter
-                  | empty'''
-    p[0] = p[1]
-
-def p_parameter(p):
-    '''parameter : data_type ID
-                 | data_type OP_NULLABLE ID'''
     p[0] = p[1]
 
 def p_body(p):
@@ -315,7 +80,6 @@ def p_empty(p):
     '''empty : '''
     pass
 
-# --- Alexander Nieves ---
 def p_data_type(p):
     '''data_type : DT_INT
                  | DT_DOUBLE
@@ -344,6 +108,270 @@ def p_error(p):
     else:
         message = "Error Sintactico: Fin de archivo inesperado (falta cerrar algo)"
     log += message + '\n'
+
+
+# ==========================================
+# --- INICIO APORTE ALEXANDER NIEVES ---
+# ==========================================
+
+# Soporte para Clases 
+def p_class_declaration(p):
+    '''class_declaration : KW_CLASS ID DEL_LBRACE class_body DEL_RBRACE
+                         | KW_CLASS ID ID ID DEL_LBRACE class_body DEL_RBRACE'''
+    global log
+    log += f"Declaracion de clase: '{p[2]}'\n"
+
+def p_class_body(p):
+    '''class_body : class_instructions
+                  | empty'''
+    pass
+
+def p_class_instructions(p):
+    '''class_instructions : class_instruction
+                          | class_instructions class_instruction'''
+    pass
+
+def p_class_instruction(p):
+    '''class_instruction : instruction
+                         | ID instruction'''
+    pass
+
+# Declaracion de variable Forma 3 (Inmutabilidad)
+def p_vd_inmutability(p):
+    '''vd_inmutability : KW_FINAL ID OP_ASSIGN valor DEL_SEMICOLON
+                       | KW_FINAL data_type ID OP_ASSIGN valor DEL_SEMICOLON
+                       | KW_CONST ID OP_ASSIGN valor DEL_SEMICOLON
+                       | KW_CONST data_type ID OP_ASSIGN valor DEL_SEMICOLON'''
+    global log
+    nombre_var = p[2] if len(p) == 6 else p[3]
+    message = f"Declaracion de variable: Inmutabilidad '{nombre_var}'"
+    log += message + '\n'
+
+# Expresiones Aritméticas
+def p_arithmetic_expression(p):
+    '''arithmetic_expression : term OP_ARITHMETIC term
+                              | DEL_LPAREN arithmetic_expression DEL_RPAREN
+                              | arithmetic_expression OP_ARITHMETIC term'''
+    p[0] = p[1]
+
+def p_term(p):
+    '''term : VAL_INT
+            | VAL_DOUBLE
+            | ID'''
+    p[0] = p[1]
+
+# Bucle For
+def p_ce_for(p):
+    '''ce_for : KW_FOR DEL_LPAREN data_type ID OP_ASSIGN valor DEL_SEMICOLON for_condition DEL_SEMICOLON for_step DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
+    global log
+    message = f"Estructura de control: For"
+    log += message + '\n'
+    p[0] = p[1]
+
+def p_for_condition(p):
+    '''for_condition : ID OP_RELACIONAL valor
+                    | valor OP_RELACIONAL ID
+                    | ID OP_LESS valor
+                    | valor OP_LESS ID
+                    | ID OP_GREATHER valor
+                    | valor OP_GREATHER ID'''
+    p[0] = p[1]
+
+def p_for_step(p):
+    '''for_step : ID OP_SINGLE_DECREMENT
+                | ID OP_SINGLE_INCREMENT
+                | ID OP_DECREMENT valor
+                | ID OP_INCREMENT valor'''
+
+# Estructura Switch
+def p_ce_switch(p):
+    '''ce_switch : KW_SWITCH DEL_LPAREN ID DEL_RPAREN DEL_LBRACE switch_cases DEL_RBRACE'''
+    global log
+    log += "Estructura de control: Switch\n"
+
+def p_switch_cases(p):
+    '''switch_cases : switch_case
+                    | switch_cases switch_case
+                    | empty'''
+    pass
+
+def p_switch_case(p):
+    '''switch_case : KW_CASE valor DEL_COLON body
+                   | KW_DEFAULT DEL_COLON body'''
+    pass
+
+# Colecciones: List
+def p_de_list(p):
+    '''de_list : DT_LIST ID OP_ASSIGN DEL_LBRACKET list_content DEL_RBRACKET DEL_SEMICOLON
+                | DT_LIST ID OP_ASSIGN DEL_LBRACKET DEL_RBRACKET DEL_SEMICOLON
+                | DT_LIST OP_LESS data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACKET list_content DEL_RBRACKET DEL_SEMICOLON
+                | DT_LIST OP_LESS data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACKET DEL_RBRACKET DEL_SEMICOLON'''
+    global log
+    if p[2] == '<':
+        message = f"Declaracion de estructura: List '{p[5]}'"
+    else:
+        message = f"Declaracion de estructura: List '{p[2]}'"
+    log += message + '\n'
+    p[0] = p[1]
+
+def p_list_content(p):
+    '''list_content : valor
+                    | list_content DEL_COMMA valor'''
+    p[0] = p[1]
+
+# Funciones Void
+def p_fd_void(p):
+    '''fd_void : KW_VOID ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body DEL_RBRACE
+               | KW_VOID ID DEL_LPAREN DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
+    global log
+    message = f"Declaracion de funcion: Void '{p[2]}'"
+    log += message + '\n'
+    p[0] = p[1]
+
+def p_parameters(p):
+    '''parameters : parameter
+                  | parameters DEL_COMMA parameter
+                  | empty'''
+    p[0] = p[1]
+
+def p_parameter(p):
+    '''parameter : data_type ID
+                 | data_type OP_NULLABLE ID'''
+    p[0] = p[1]
+# --- FIN APORTE ALEXANDER NIEVES ---
+
+
+# ==========================================
+# --- INICIO APORTE SOFIA IZAGUIRRE ---
+# ==========================================
+
+# Declaracion de variable Forma 1 (Inferencia)
+def p_vd_inference(p):
+    '''vd_inference : KW_VAR ID OP_ASSIGN valor DEL_SEMICOLON
+                    | KW_VAR ID OP_ASSIGN arithmetic_expression DEL_SEMICOLON'''
+    global log
+    log += f"Declaracion de variable: Inferencia de tipo '{p[2]}'\n"
+
+# Expresiones booleanas
+def p_boolean_expression(p):
+    '''boolean_expression : valor OP_RELACIONAL valor
+                          | valor OP_LESS valor
+                          | valor OP_GREATHER valor
+                          | DEL_LPAREN boolean_expression DEL_RPAREN
+                          | boolean_expression OP_LOGIC boolean_expression
+                          | OP_LOGIC boolean_expression
+                          | OP_LOGIC valor
+                          | KW_TRUE
+                          | KW_FALSE'''
+    p[0] = p[1]
+
+# Condicional If/Else
+def p_ce_if_else(p):
+    '''ce_if_else : KW_IF DEL_LPAREN boolean_expression DEL_RPAREN DEL_LBRACE body DEL_RBRACE
+                  | KW_IF DEL_LPAREN boolean_expression DEL_RPAREN DEL_LBRACE body DEL_RBRACE KW_ELSE DEL_LBRACE body DEL_RBRACE'''
+    global log
+    if len(p) == 8:
+        log += "Estructura de control: IF\n"
+    else:
+        log += "Estructura de control: IF-ELSE\n"
+
+# Colecciones: Map
+def p_de_map(p):
+    '''de_map : DT_MAP OP_LESS data_type DEL_COMMA data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACE map_elements DEL_RBRACE DEL_SEMICOLON
+              | DT_MAP ID OP_ASSIGN DEL_LBRACE map_elements DEL_RBRACE DEL_SEMICOLON
+              | DT_MAP OP_LESS data_type DEL_COMMA data_type OP_GREATHER OP_NULLABLE ID DEL_SEMICOLON
+              | DT_MAP OP_NULLABLE ID DEL_SEMICOLON'''
+    global log
+    log += f"Declaracion de estructura: Map\n"
+
+def p_map_elements(p):
+    '''map_elements : valor DEL_COLON valor
+                    | valor DEL_COLON valor DEL_COMMA map_elements
+                    | empty'''
+    pass
+
+# Declaracion de funcion estandar con retorno
+def p_fd_return(p):
+    '''fd_return : data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body DEL_RBRACE
+                 | data_type ID DEL_LPAREN DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
+    global log
+    log += f"Declaracion de funcion: Retorno '{p[2]}'\n"
+# --- FIN APORTE SOFIA IZAGUIRRE ---
+
+
+# ==========================================
+# --- INICIO APORTE DANIEL CORTEZ ---
+# ==========================================
+
+# Declaracion de variable Forma 4 (Nulabilidad)
+def p_vd_nullability(p):
+    '''vd_nullability : data_type OP_NULLABLE ID DEL_SEMICOLON
+                      | data_type OP_NULLABLE ID OP_ASSIGN valor DEL_SEMICOLON'''
+    global log
+    if len(p) == 5:
+        message = f"Declaracion de variable nulable: '{p[3]}'"
+    else:
+        message = f"Declaracion de variable nulable con valor: '{p[3]}' = {p[5]}"
+    log += message + '\n'
+
+# Declaracion de variable Forma 2 (Tipado Estático)
+def p_vd_static(p):
+    '''vd_static : data_type ID OP_ASSIGN valor DEL_SEMICOLON
+                 | data_type ID DEL_SEMICOLON
+                 | data_type ID OP_ASSIGN arithmetic_expression DEL_SEMICOLON
+                 | data_type ID OP_ASSIGN boolean_expression DEL_SEMICOLON'''
+    global log
+    log += f"Declaracion de variable: Tipado estatico '{p[2]}'\n"
+
+# Bucle While
+def p_ce_while(p):
+    '''ce_while : KW_WHILE DEL_LPAREN boolean_expression DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
+    global log
+    log += "Estructura de control: While\n"
+
+# Colecciones: Set
+def p_de_set(p):
+    '''de_set : DT_SET OP_LESS data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACE set_elements DEL_RBRACE DEL_SEMICOLON
+              | DT_SET ID OP_ASSIGN DEL_LBRACE set_elements DEL_RBRACE DEL_SEMICOLON
+              | DT_SET OP_LESS data_type OP_GREATHER OP_NULLABLE ID DEL_SEMICOLON
+              | DT_SET OP_NULLABLE ID DEL_SEMICOLON'''
+    global log
+    log += f"Declaracion de estructura: Set\n"
+
+def p_set_elements(p):
+    '''set_elements : valor
+                    | valor DEL_COMMA set_elements
+                    | empty'''
+    pass
+
+# Funcion lambda/flecha
+def p_fd_lambda(p):
+    '''fd_lambda : data_type ID DEL_LPAREN parameters DEL_RPAREN OP_FLECHA arithmetic_expression DEL_SEMICOLON
+                 | data_type ID DEL_LPAREN parameters DEL_RPAREN OP_FLECHA boolean_expression DEL_SEMICOLON
+                 | data_type ID DEL_LPAREN parameters DEL_RPAREN OP_FLECHA valor DEL_SEMICOLON
+                 | data_type ID DEL_LPAREN DEL_RPAREN OP_FLECHA arithmetic_expression DEL_SEMICOLON
+                 | data_type ID DEL_LPAREN DEL_RPAREN OP_FLECHA boolean_expression DEL_SEMICOLON
+                 | data_type ID DEL_LPAREN DEL_RPAREN OP_FLECHA valor DEL_SEMICOLON'''
+    global log
+    log += f"Declaracion de funcion: Lambda '{p[2]}'\n"
+
+# Impresión y Solicitud de datos
+def p_io_print(p):
+    '''io_print : KW_PRINT DEL_LPAREN print_content DEL_RPAREN DEL_SEMICOLON'''
+    global log
+    log += "Impresion de datos: print\n"
+
+def p_print_content(p):
+    '''print_content : arithmetic_expression
+                     | boolean_expression
+                     | valor'''
+    pass
+
+def p_io_read(p):
+    '''io_read : data_type OP_NULLABLE ID OP_ASSIGN ID DEL_DOT ID DEL_LPAREN DEL_RPAREN DEL_SEMICOLON'''
+    global log
+    log += f"Solicitud de datos: readLineSync a la variable '{p[3]}'\n"
+# --- FIN APORTE DANIEL CORTEZ ---
 
 parser = yacc.yacc()
 
