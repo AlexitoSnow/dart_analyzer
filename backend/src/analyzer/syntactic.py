@@ -16,6 +16,11 @@ def p_instruction(p):
                    | function_declarations
                    | class_declaration
                    | input_output
+                   | KW_BREAK DEL_SEMICOLON
+                   | KW_RETURN DEL_SEMICOLON
+                   | KW_RETURN arithmetic_expression DEL_SEMICOLON
+                   | KW_RETURN boolean_expression DEL_SEMICOLON
+                   | ID instruction
                    | error DEL_SEMICOLON
                    | error DEL_RBRACE'''
     p[0] = p[1]
@@ -53,8 +58,6 @@ def p_function_declarations(p):
                             | fd_lambda'''
     p[0] = p[1]
 
-
-# --- NUEVO: Soporte para Clases ---
 def p_class_declaration(p):
     '''class_declaration : KW_CLASS ID DEL_LBRACE class_body DEL_RBRACE
                          | KW_CLASS ID ID ID DEL_LBRACE class_body DEL_RBRACE'''
@@ -62,8 +65,7 @@ def p_class_declaration(p):
     log += f"Declaracion de clase: '{p[2]}'\n"
 
 def p_class_body(p):
-    '''class_body : instruction
-                  | class_body instruction
+    '''class_body : instructions
                   | empty'''
     pass
 
@@ -204,7 +206,6 @@ def p_de_map(p):
               | DT_MAP OP_LESS data_type DEL_COMMA data_type OP_GREATHER OP_NULLABLE ID DEL_SEMICOLON
               | DT_MAP OP_NULLABLE ID DEL_SEMICOLON'''
     global log
-    nombre_var = p[7] if len(p) > 10 else p[2]
     log += f"Declaracion de estructura: Map\n"
 
 def p_map_elements(p):
@@ -250,9 +251,7 @@ def p_list_content(p):
 # --- Sofia Izaguirre ---
 # Declaracion de funcion estandar con retorno
 def p_fd_return(p):
-    '''fd_return : data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body KW_RETURN valor DEL_SEMICOLON DEL_RBRACE
-                 | data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body KW_RETURN arithmetic_expression DEL_SEMICOLON DEL_RBRACE
-                 | data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
+    '''fd_return : data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
     global log
     log += f"Declaracion de funcion: Retorno '{p[2]}'\n"
 
@@ -273,17 +272,15 @@ def p_io_print(p):
     log += "Impresion de datos: print\n"
 
 def p_print_content(p):
-    '''print_content : valor
-                     | ID
-                     | valor OP_ARITHMETIC ID
-                     | ID OP_ARITHMETIC ID'''
+    '''print_content : arithmetic_expression
+                     | boolean_expression
+                     | valor'''
     pass
 
 def p_io_read(p):
     '''io_read : data_type OP_NULLABLE ID OP_ASSIGN ID DEL_DOT ID DEL_LPAREN DEL_RPAREN DEL_SEMICOLON'''
     global log
     log += f"Solicitud de datos: readLineSync a la variable '{p[3]}'\n"
-
 
 # --- Alexander Nieves ---
 def p_fd_void(p):
@@ -305,12 +302,14 @@ def p_parameter(p):
     p[0] = p[1]
 
 def p_body(p):
-    '''body : instruction
-            | KW_BREAK DEL_SEMICOLON
-            | KW_RETURN DEL_SEMICOLON
-            | body instruction
+    '''body : instructions
             | empty'''
-    p[0] = p[1]
+    pass
+
+def p_instructions(p):
+    '''instructions : instruction
+                    | instructions instruction'''
+    pass
 
 def p_empty(p):
     '''empty : '''
@@ -324,8 +323,7 @@ def p_data_type(p):
                  | DT_STRING
                  | DT_LIST
                  | DT_MAP
-                 | DT_SET
-                 | KW_VAR'''
+                 | DT_SET'''
     p[0] = p[1]
 
 def p_valor(p):
