@@ -1,0 +1,13 @@
+Declaracion de variable: Tipado estatico 'mensaje'
+Declaracion de variable: Inmutabilidad 'mensaje2'
+Declaracion de estructura: List 'lista'
+Error Sintactico: Estructura no valida cerca de '?' en la linea 11
+Declaracion de variable: Tipado estatico 'a'
+Declaracion de variable: Tipado estatico 'b'
+Error Sintactico: Estructura no valida cerca de '(' en la linea 14
+Estructura de control: IF
+Estructura de control: IF
+Estructura de control: Switch
+Declaracion de funcion: Void 'main'
+Declaracion de clase: 'MyClass'
+

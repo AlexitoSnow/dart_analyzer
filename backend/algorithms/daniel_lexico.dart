@@ -14,3 +14,5 @@ void main() {
   
   int calcular() => 42;
 }
+/*Caracter(es) no reconocido lexicamente implementado para fallar a proposito */
+¿¡

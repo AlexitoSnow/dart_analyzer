@@ -1,0 +1,11 @@
+Declaracion de variable: Inferencia de tipo 'x'
+Declaracion de variable: Inmutabilidad 'constanteEntera'
+Declaracion de variable: Inmutabilidad 'esVerdad'
+Declaracion de variable: Tipado estatico 'esFalso'
+Declaracion de estructura: Map
+Error Sintactico: Estructura no valida cerca de ')' en la linea 14
+Declaracion de funcion: Void 'main'
+Error Sintactico: Estructura no valida cerca de '=' en la linea 20
+Estructura de control: Switch
+Error Sintactico: Estructura no valida cerca de '}' en la linea 31
+

@@ -29,5 +29,6 @@ void main() {
       break;
   }
 }
-
+/*Caracter(es) no reconocido lexicamente implementado para fallar a proposito */
+@
 class MyClass {}
