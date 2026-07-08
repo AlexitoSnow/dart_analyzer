@@ -1,6 +1,7 @@
 import ply.yacc as yacc
 from .lexical import tokens
 from . import semantic 
+from .semantic import declare_variable, check_variable_declared, check_reassignment
 
 log = ''
 
@@ -14,6 +15,7 @@ def p_programa(p):
 def p_instruction(p):
     '''instruction : variable_declaration
                    | expressions
+                   | reasignacion
                    | control_structures
                    | data_structures
                    | function_declarations
@@ -116,7 +118,7 @@ def p_valor(p):
              | ID'''
     # CORRECCIÓN SEMÁNTICA: Solo busca variables si el token es estrictamente de tipo ID
     if len(p) == 2 and p.slice[1].type == 'ID' and p[1] not in ['true', 'false', 'null']:
-        semantic.get_variable(p[1], line=p.lineno(1))
+        semantic.check_variable_declared(p[1], line=p.lineno(1))
     p[0] = p[1]
 
 def p_error(p):
@@ -327,6 +329,17 @@ def p_fd_return(p):
                  | data_type ID DEL_LPAREN DEL_RPAREN open_scope body close_scope'''
     global log
     log += f"Declaracion de funcion: Retorno '{p[2]}'\n"
+
+# Validacion de reasignacion para constantes (Regla Semántica 2)
+def p_reasignacion(p):
+    '''reasignacion : ID OP_ASSIGN valor DEL_SEMICOLON
+                    | ID OP_ASSIGN arithmetic_expression DEL_SEMICOLON
+                    | ID OP_ASSIGN boolean_expression DEL_SEMICOLON'''
+    global log
+    # VALIDACIÓN SEMÁNTICA: Verifica que no sea constante
+    semantic.check_reassignment(p[1], line=p.lineno(1))
+    log += f"Reasignacion de variable: '{p[1]}'\n"
+
 # --- FIN APORTE SOFIA IZAGUIRRE ---
 
 
