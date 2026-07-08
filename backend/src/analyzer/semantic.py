@@ -102,11 +102,37 @@ def validate_operation(left_type, operator, right_type, line=0):
 # ==========================================
 # --- INICIO APORTE SOFIA IZAGUIRRE ---
 # ==========================================
-def check_variable_declared(name):
-    pass
+# REGLA 1: Identificadores (Declaración previa)
+def check_variable_declared(name, line=0):
+    global log
+    # funcion para buscar en la memoria
+    symbol = get_variable(name, line)
+    
+    if symbol is None:
+        # Si la variable no existe, generamos mensaje de error 
+        message = f"Error Semántico (Línea {line}): La variable '{name}' no ha sido declarada antes de su uso."
+        print(message)
+        log += message + '\n'
+        return False
+        
+    return True
 
-def check_reassignment(name):
-    pass
+# REGLA 2: Asignación de tipo (Constantes)
+def check_reassignment(name, line=0):
+    global log
+    # Primero verificamos si existe 
+    if not check_variable_declared(name, line):
+        return False        
+    # La buscamos en la tabla
+    symbol = get_variable(name, line)    
+    # Verificamos si es una constante
+    if symbol and symbol.is_constant:
+        message = f"Error Semántico (Línea {line}): No se puede reasignar un valor a la constante '{name}'."
+        print(message)
+        log += message + '\n'
+        return False
+        
+    return True
 # --- FIN APORTE SOFIA IZAGUIRRE ---
 
 
