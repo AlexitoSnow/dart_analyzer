@@ -1,5 +1,6 @@
 import ply.yacc as yacc
 from .lexical import tokens
+from . import semantic 
 
 log = ''
 
@@ -28,6 +29,18 @@ def p_instruction(p):
                    | error DEL_RBRACE'''
     p[0] = p[1]
 
+# --- REGLAS MARCADORAS DE SCOPE ---
+def p_open_scope(p):
+    '''open_scope : DEL_LBRACE'''
+    semantic.enter_scope() 
+    p[0] = p[1]
+
+def p_close_scope(p):
+    '''close_scope : DEL_RBRACE'''
+    semantic.exit_scope() 
+    p[0] = p[1]
+# -------------------------------------------------------
+
 def p_variable_declaration(p):
     '''variable_declaration : vd_inmutability
                             | vd_nullability
@@ -40,6 +53,8 @@ def p_expressions(p):
                    | boolean_expression
                    | ID OP_SINGLE_INCREMENT DEL_SEMICOLON
                    | ID OP_SINGLE_DECREMENT DEL_SEMICOLON'''
+    if len(p) == 4 and p[2] in ['++', '--']:
+        semantic.get_variable(p[1], line=p.lineno(1))
     p[0] = p[1]
 
 def p_control_structures(p):
@@ -99,6 +114,9 @@ def p_valor(p):
              | KW_TRUE
              | KW_FALSE
              | ID'''
+    # CORRECCIÓN SEMÁNTICA: Solo busca variables si el token es estrictamente de tipo ID
+    if len(p) == 2 and p.slice[1].type == 'ID' and p[1] not in ['true', 'false', 'null']:
+        semantic.get_variable(p[1], line=p.lineno(1))
     p[0] = p[1]
 
 def p_error(p):
@@ -116,8 +134,8 @@ def p_error(p):
 
 # Soporte para Clases 
 def p_class_declaration(p):
-    '''class_declaration : KW_CLASS ID DEL_LBRACE class_body DEL_RBRACE
-                         | KW_CLASS ID ID ID DEL_LBRACE class_body DEL_RBRACE'''
+    '''class_declaration : KW_CLASS ID open_scope class_body close_scope
+                         | KW_CLASS ID ID ID open_scope class_body close_scope'''
     global log
     log += f"Declaracion de clase: '{p[2]}'\n"
 
@@ -144,8 +162,11 @@ def p_vd_inmutability(p):
                        | KW_CONST data_type ID OP_ASSIGN valor DEL_SEMICOLON'''
     global log
     nombre_var = p[2] if len(p) == 6 else p[3]
-    message = f"Declaracion de variable: Inmutabilidad '{nombre_var}'"
-    log += message + '\n'
+    tipo_dato = p[1] if len(p) == 6 else p[2]
+    linea = p.lineno(2) if len(p) == 6 else p.lineno(3)
+    
+    semantic.declare_variable(nombre_var, tipo_dato, is_constant=True, line=linea) 
+    log += f"Declaracion de variable: Inmutabilidad '{nombre_var}'\n"
 
 # Expresiones Aritméticas
 def p_arithmetic_expression(p):
@@ -161,11 +182,15 @@ def p_term(p):
     p[0] = p[1]
 
 # Bucle For
+def p_for_init(p):
+    '''for_init : data_type ID OP_ASSIGN valor'''
+    semantic.declare_variable(p[2], p[1], line=p.lineno(2)) # Variable 'i' registrada
+    p[0] = p[2]
+
 def p_ce_for(p):
-    '''ce_for : KW_FOR DEL_LPAREN data_type ID OP_ASSIGN valor DEL_SEMICOLON for_condition DEL_SEMICOLON for_step DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
+    '''ce_for : KW_FOR DEL_LPAREN for_init DEL_SEMICOLON for_condition DEL_SEMICOLON for_step DEL_RPAREN open_scope body close_scope'''
     global log
-    message = f"Estructura de control: For"
-    log += message + '\n'
+    log += f"Estructura de control: For\n"
     p[0] = p[1]
 
 def p_for_condition(p):
@@ -185,7 +210,7 @@ def p_for_step(p):
 
 # Estructura Switch
 def p_ce_switch(p):
-    '''ce_switch : KW_SWITCH DEL_LPAREN ID DEL_RPAREN DEL_LBRACE switch_cases DEL_RBRACE'''
+    '''ce_switch : KW_SWITCH DEL_LPAREN ID DEL_RPAREN open_scope switch_cases close_scope'''
     global log
     log += "Estructura de control: Switch\n"
 
@@ -208,10 +233,12 @@ def p_de_list(p):
                 | DT_LIST OP_LESS data_type OP_GREATHER ID OP_ASSIGN DEL_LBRACKET DEL_RBRACKET DEL_SEMICOLON'''
     global log
     if p[2] == '<':
-        message = f"Declaracion de estructura: List '{p[5]}'"
+        nombre_var, linea = p[5], p.lineno(5)
     else:
-        message = f"Declaracion de estructura: List '{p[2]}'"
-    log += message + '\n'
+        nombre_var, linea = p[2], p.lineno(2)
+        
+    semantic.declare_variable(nombre_var, 'DT_LIST', line=linea)
+    log += f"Declaracion de estructura: List '{nombre_var}'\n"
     p[0] = p[1]
 
 def p_list_content(p):
@@ -221,11 +248,10 @@ def p_list_content(p):
 
 # Funciones Void
 def p_fd_void(p):
-    '''fd_void : KW_VOID ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body DEL_RBRACE
-               | KW_VOID ID DEL_LPAREN DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
+    '''fd_void : KW_VOID ID DEL_LPAREN parameters DEL_RPAREN open_scope body close_scope
+               | KW_VOID ID DEL_LPAREN DEL_RPAREN open_scope body close_scope'''
     global log
-    message = f"Declaracion de funcion: Void '{p[2]}'"
-    log += message + '\n'
+    log += f"Declaracion de funcion: Void '{p[2]}'\n"
     p[0] = p[1]
 
 def p_parameters(p):
@@ -250,6 +276,7 @@ def p_vd_inference(p):
     '''vd_inference : KW_VAR ID OP_ASSIGN valor DEL_SEMICOLON
                     | KW_VAR ID OP_ASSIGN arithmetic_expression DEL_SEMICOLON'''
     global log
+    semantic.declare_variable(p[2], 'KW_VAR', line=p.lineno(2)) 
     log += f"Declaracion de variable: Inferencia de tipo '{p[2]}'\n"
 
 # Expresiones booleanas
@@ -267,8 +294,8 @@ def p_boolean_expression(p):
 
 # Condicional If/Else
 def p_ce_if_else(p):
-    '''ce_if_else : KW_IF DEL_LPAREN boolean_expression DEL_RPAREN DEL_LBRACE body DEL_RBRACE
-                  | KW_IF DEL_LPAREN boolean_expression DEL_RPAREN DEL_LBRACE body DEL_RBRACE KW_ELSE DEL_LBRACE body DEL_RBRACE'''
+    '''ce_if_else : KW_IF DEL_LPAREN boolean_expression DEL_RPAREN open_scope body close_scope
+                  | KW_IF DEL_LPAREN boolean_expression DEL_RPAREN open_scope body close_scope KW_ELSE open_scope body close_scope'''
     global log
     if len(p) == 8:
         log += "Estructura de control: IF\n"
@@ -282,6 +309,10 @@ def p_de_map(p):
               | DT_MAP OP_LESS data_type DEL_COMMA data_type OP_GREATHER OP_NULLABLE ID DEL_SEMICOLON
               | DT_MAP OP_NULLABLE ID DEL_SEMICOLON'''
     global log
+    nombre_var = p[7] if len(p) == 13 else (p[2] if len(p) == 8 else (p[8] if len(p) == 10 else p[3]))
+    linea = p.lineno(7) if len(p) == 13 else (p.lineno(2) if len(p) == 8 else (p.lineno(8) if len(p) == 10 else p.lineno(3)))
+    
+    semantic.declare_variable(nombre_var, 'DT_MAP', line=linea)
     log += f"Declaracion de estructura: Map\n"
 
 def p_map_elements(p):
@@ -292,8 +323,8 @@ def p_map_elements(p):
 
 # Declaracion de funcion estandar con retorno
 def p_fd_return(p):
-    '''fd_return : data_type ID DEL_LPAREN parameters DEL_RPAREN DEL_LBRACE body DEL_RBRACE
-                 | data_type ID DEL_LPAREN DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
+    '''fd_return : data_type ID DEL_LPAREN parameters DEL_RPAREN open_scope body close_scope
+                 | data_type ID DEL_LPAREN DEL_RPAREN open_scope body close_scope'''
     global log
     log += f"Declaracion de funcion: Retorno '{p[2]}'\n"
 # --- FIN APORTE SOFIA IZAGUIRRE ---
@@ -308,6 +339,7 @@ def p_vd_nullability(p):
     '''vd_nullability : data_type OP_NULLABLE ID DEL_SEMICOLON
                       | data_type OP_NULLABLE ID OP_ASSIGN valor DEL_SEMICOLON'''
     global log
+    semantic.declare_variable(p[3], p[1], line=p.lineno(3))
     if len(p) == 5:
         message = f"Declaracion de variable nulable: '{p[3]}'"
     else:
@@ -321,11 +353,12 @@ def p_vd_static(p):
                  | data_type ID OP_ASSIGN arithmetic_expression DEL_SEMICOLON
                  | data_type ID OP_ASSIGN boolean_expression DEL_SEMICOLON'''
     global log
+    semantic.declare_variable(p[2], p[1], line=p.lineno(2)) 
     log += f"Declaracion de variable: Tipado estatico '{p[2]}'\n"
 
 # Bucle While
 def p_ce_while(p):
-    '''ce_while : KW_WHILE DEL_LPAREN boolean_expression DEL_RPAREN DEL_LBRACE body DEL_RBRACE'''
+    '''ce_while : KW_WHILE DEL_LPAREN boolean_expression DEL_RPAREN open_scope body close_scope'''
     global log
     log += "Estructura de control: While\n"
 
@@ -336,6 +369,16 @@ def p_de_set(p):
               | DT_SET OP_LESS data_type OP_GREATHER OP_NULLABLE ID DEL_SEMICOLON
               | DT_SET OP_NULLABLE ID DEL_SEMICOLON'''
     global log
+    if len(p) == 11:
+        nombre_var, linea = p[5], p.lineno(5)
+    elif len(p) == 8 and p[2] == '<':
+        nombre_var, linea = p[6], p.lineno(6)
+    elif len(p) == 8:
+        nombre_var, linea = p[2], p.lineno(2)
+    else:
+        nombre_var, linea = p[3], p.lineno(3)
+        
+    semantic.declare_variable(nombre_var, 'DT_SET', line=linea)
     log += f"Declaracion de estructura: Set\n"
 
 def p_set_elements(p):
