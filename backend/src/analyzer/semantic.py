@@ -47,10 +47,9 @@ def declare_variable(name, data_type, is_constant=False, line=0):
         
     current_scope[name] = Symbol(name, data_type, is_constant)
     
-    # Mensaje de Éxito (Opcional, útil para sus pruebas)
+    # Mensaje de Éxito
     success_msg = f"Semantico (Linea {line}): Variable '{name}' declarada correctamente en memoria."
     print(success_msg)
-    # log += success_msg + '\n' # (Descomenta esta línea si quieres que los éxitos salgan en el TXT final)
     
     return True
 
