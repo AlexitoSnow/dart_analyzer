@@ -12,7 +12,7 @@
             "cwd": "${workspaceFolder}/backend",
             "console": "integratedTerminal",
             "args": "${command:pickArgs}",
-            "python": "${workspaceFolder}/backend/venv/bin/python"
+            "python": "${workspaceFolder}/backend/venv/Scripts/python.exe"
         },
         {
             "name": "Dart Analyzer UI: Launch Frontend",
@@ -21,7 +21,7 @@
             "program": "${workspaceFolder}/frontend/src/app.py",
             "cwd": "${workspaceFolder}/frontend",
             "console": "integratedTerminal",
-            "python": "${workspaceFolder}/frontend/venv/bin/python"
+            "python": "${workspaceFolder}/frontend/venv/Scripts/python.exe"
         }
     ]
 }
