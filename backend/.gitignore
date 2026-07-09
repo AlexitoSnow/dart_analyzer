@@ -136,3 +136,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# PLY parser files
+src/analyzer/parser.out
+src/analyzer/parsetab.py
