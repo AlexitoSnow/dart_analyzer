@@ -1,0 +1,3 @@
+Error Semántico (Línea 4): El tipo de retorno 'bool' no coincide con el tipo 'int' declarado en la función.
+Error Semántico (Línea 8): La sentencia 'break' solo puede usarse dentro de un bucle o switch.
+

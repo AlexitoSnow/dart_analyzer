@@ -11,6 +11,7 @@ class Symbol:
 
 # --- ESTRUCTURA BASE ---
 symbol_table = [{}] 
+function_type_stack = [None]
 current_function_type = None
 loop_and_switch_depth = 0
 
@@ -20,13 +21,19 @@ loop_and_switch_depth = 0
 
 # REGLA 1: Alcance de variables (Scope)
 def enter_scope():
-    global symbol_table
+    global symbol_table, function_type_stack, current_function_type
     symbol_table.append({})
+    if current_function_type != function_type_stack[-1]:
+        function_type_stack.append(current_function_type)
+    else:
+        function_type_stack.append(function_type_stack[-1])
 
 def exit_scope():
-    global symbol_table
+    global symbol_table, function_type_stack, current_function_type
     if len(symbol_table) > 1:
         symbol_table.pop()
+        function_type_stack.pop()
+        current_function_type = function_type_stack[-1]
 
 def declare_variable(name, data_type, is_constant=False, line=0):
     global log, symbol_table
@@ -139,11 +146,71 @@ def check_reassignment(name, line=0):
 # ==========================================
 # --- INICIO APORTE ALEXANDER NIEVES ---
 # ==========================================
-def validate_return_type(return_type):
-    pass
+def normalize_type(t):
+    if not t:
+        return 'void'
+    t_map = {
+        'DT_INT': 'int',
+        'DT_DOUBLE': 'double',
+        'DT_BOOL': 'bool',
+        'DT_STRING': 'String',
+        'DT_LIST': 'List',
+        'DT_MAP': 'Map',
+        'DT_SET': 'Set',
+        'int': 'int',
+        'double': 'double',
+        'bool': 'bool',
+        'String': 'String',
+        'List': 'List',
+        'Map': 'Map',
+        'Set': 'Set',
+        'void': 'void',
+    }
+    return t_map.get(t, t)
 
-def validate_break_continue():
-    pass
+def get_type_of_val(val):
+    if isinstance(val, bool):
+        return 'bool'
+    if isinstance(val, int):
+        return 'int'
+    if isinstance(val, float):
+        return 'double'
+    if isinstance(val, str):
+        if val in ['true', 'false']:
+            return 'bool'
+        if val == 'null':
+            return 'null'
+        # Lookup in symbol table
+        for scope in reversed(symbol_table):
+            if val in scope:
+                return normalize_type(scope[val].data_type)
+        return 'String'
+    return 'void'
+
+def validate_return_type(return_type, line=0):
+    global log, current_function_type
+    if current_function_type is None:
+        return True
+    
+    declared_type = normalize_type(current_function_type)
+    actual_type = normalize_type(return_type)
+    
+    if actual_type != 'null' and declared_type != actual_type:
+        if declared_type not in ['KW_VAR', 'var']:
+            message = f"Error Semántico (Línea {line}): El tipo de retorno '{actual_type}' no coincide con el tipo '{declared_type}' declarado en la función."
+            print(message)
+            log += message + '\n'
+            return False
+    return True
+
+def validate_break_continue(statement='break', line=0):
+    global log, loop_and_switch_depth
+    if loop_and_switch_depth <= 0:
+        message = f"Error Semántico (Línea {line}): La sentencia '{statement}' solo puede usarse dentro de un bucle o switch."
+        print(message)
+        log += message + '\n'
+        return False
+    return True
 # --- FIN APORTE ALEXANDER NIEVES ---
 
 
@@ -151,10 +218,13 @@ def validate_break_continue():
 # --- MOTOR DEL ANALIZADOR SEMÁNTICO ---
 # ==========================================
 def semantic_analysis(lexer) -> str:
-    global log, symbol_table
+    global log, symbol_table, function_type_stack, current_function_type, loop_and_switch_depth
     
     log = ''
     symbol_table = [{}]
+    function_type_stack = [None]
+    current_function_type = None
+    loop_and_switch_depth = 0
     
     from .syntactic import parser
     parser.parse(lexer=lexer)

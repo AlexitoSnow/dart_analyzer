@@ -1,0 +1,4 @@
+Error Semántico (Línea 5): No se puede reasignar un valor a la constante 'limite'.
+Error Semantico (Linea 7): La variable 'valorNoDeclarado' esta fuera de alcance (scope) o no ha sido declarada.
+Error Semántico (Línea 7): La variable 'valorNoDeclarado' no ha sido declarada antes de su uso.
+

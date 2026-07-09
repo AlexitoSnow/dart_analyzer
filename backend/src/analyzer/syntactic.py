@@ -30,6 +30,24 @@ def p_instruction(p):
                    | error DEL_SEMICOLON
                    | error DEL_RBRACE'''
     p[0] = p[1]
+    if isinstance(p[1], str):
+        if p[1] == 'break':
+            semantic.validate_break_continue('break', line=p.lineno(1))
+        elif p[1] == 'return':
+            if len(p) == 3:
+                semantic.validate_return_type('void', line=p.lineno(1))
+            elif len(p) == 4:
+                expr_type = 'void'
+                symbol_type = p.slice[2].type
+                if symbol_type == 'arithmetic_expression':
+                    expr_type = semantic.get_type_of_val(p[2])
+                    if expr_type not in ['int', 'double']:
+                        expr_type = 'int'
+                elif symbol_type == 'boolean_expression':
+                    expr_type = 'bool'
+                elif symbol_type == 'valor':
+                    expr_type = semantic.get_type_of_val(p[2])
+                semantic.validate_return_type(expr_type, line=p.lineno(1))
 
 # --- REGLAS MARCADORAS DE SCOPE ---
 def p_open_scope(p):
@@ -41,6 +59,15 @@ def p_close_scope(p):
     '''close_scope : DEL_RBRACE'''
     semantic.exit_scope() 
     p[0] = p[1]
+
+# --- REGLAS MARCADORAS DE CONTROL FLOW ---
+def p_enter_loop(p):
+    '''enter_loop : '''
+    semantic.loop_and_switch_depth += 1
+
+def p_exit_loop(p):
+    '''exit_loop : '''
+    semantic.loop_and_switch_depth -= 1
 # -------------------------------------------------------
 
 def p_variable_declaration(p):
@@ -128,6 +155,7 @@ def p_error(p):
     else:
         message = "Error Sintactico: Fin de archivo inesperado (falta cerrar algo)"
     log += message + '\n'
+    semantic.current_function_type = semantic.function_type_stack[-1] if hasattr(semantic, 'function_type_stack') else None
 
 
 # ==========================================
@@ -190,7 +218,7 @@ def p_for_init(p):
     p[0] = p[2]
 
 def p_ce_for(p):
-    '''ce_for : KW_FOR DEL_LPAREN for_init DEL_SEMICOLON for_condition DEL_SEMICOLON for_step DEL_RPAREN open_scope body close_scope'''
+    '''ce_for : KW_FOR DEL_LPAREN for_init DEL_SEMICOLON for_condition DEL_SEMICOLON for_step DEL_RPAREN enter_loop open_scope body close_scope exit_loop'''
     global log
     log += f"Estructura de control: For\n"
     p[0] = p[1]
@@ -212,7 +240,7 @@ def p_for_step(p):
 
 # Estructura Switch
 def p_ce_switch(p):
-    '''ce_switch : KW_SWITCH DEL_LPAREN ID DEL_RPAREN open_scope switch_cases close_scope'''
+    '''ce_switch : KW_SWITCH DEL_LPAREN ID DEL_RPAREN enter_loop open_scope switch_cases close_scope exit_loop'''
     global log
     log += "Estructura de control: Switch\n"
 
@@ -249,12 +277,18 @@ def p_list_content(p):
     p[0] = p[1]
 
 # Funciones Void
+def p_fd_void_header(p):
+    '''fd_void_header : KW_VOID ID DEL_LPAREN parameters DEL_RPAREN
+                      | KW_VOID ID DEL_LPAREN DEL_RPAREN'''
+    semantic.current_function_type = 'void'
+    p[0] = p[2]
+
 def p_fd_void(p):
-    '''fd_void : KW_VOID ID DEL_LPAREN parameters DEL_RPAREN open_scope body close_scope
-               | KW_VOID ID DEL_LPAREN DEL_RPAREN open_scope body close_scope'''
+    '''fd_void : fd_void_header open_scope body close_scope'''
     global log
-    log += f"Declaracion de funcion: Void '{p[2]}'\n"
-    p[0] = p[1]
+    log += f"Declaracion de funcion: Void '{p[1]}'\n"
+    semantic.current_function_type = None
+    p[0] = 'void'
 
 def p_parameters(p):
     '''parameters : parameter
@@ -323,12 +357,18 @@ def p_map_elements(p):
                     | empty'''
     pass
 
+def p_fd_return_header(p):
+    '''fd_return_header : data_type ID DEL_LPAREN parameters DEL_RPAREN
+                        | data_type ID DEL_LPAREN DEL_RPAREN'''
+    semantic.current_function_type = p[1]
+    p[0] = (p[1], p[2])
+
 # Declaracion de funcion estandar con retorno
 def p_fd_return(p):
-    '''fd_return : data_type ID DEL_LPAREN parameters DEL_RPAREN open_scope body close_scope
-                 | data_type ID DEL_LPAREN DEL_RPAREN open_scope body close_scope'''
+    '''fd_return : fd_return_header open_scope body close_scope'''
     global log
-    log += f"Declaracion de funcion: Retorno '{p[2]}'\n"
+    log += f"Declaracion de funcion: Retorno '{p[1][1]}'\n"
+    semantic.current_function_type = None
 
 # Validacion de reasignacion para constantes (Regla Semántica 2)
 def p_reasignacion(p):
@@ -371,7 +411,7 @@ def p_vd_static(p):
 
 # Bucle While
 def p_ce_while(p):
-    '''ce_while : KW_WHILE DEL_LPAREN boolean_expression DEL_RPAREN open_scope body close_scope'''
+    '''ce_while : KW_WHILE DEL_LPAREN boolean_expression DEL_RPAREN enter_loop open_scope body close_scope exit_loop'''
     global log
     log += "Estructura de control: While\n"
 
@@ -402,14 +442,12 @@ def p_set_elements(p):
 
 # Funcion lambda/flecha
 def p_fd_lambda(p):
-    '''fd_lambda : data_type ID DEL_LPAREN parameters DEL_RPAREN OP_FLECHA arithmetic_expression DEL_SEMICOLON
-                 | data_type ID DEL_LPAREN parameters DEL_RPAREN OP_FLECHA boolean_expression DEL_SEMICOLON
-                 | data_type ID DEL_LPAREN parameters DEL_RPAREN OP_FLECHA valor DEL_SEMICOLON
-                 | data_type ID DEL_LPAREN DEL_RPAREN OP_FLECHA arithmetic_expression DEL_SEMICOLON
-                 | data_type ID DEL_LPAREN DEL_RPAREN OP_FLECHA boolean_expression DEL_SEMICOLON
-                 | data_type ID DEL_LPAREN DEL_RPAREN OP_FLECHA valor DEL_SEMICOLON'''
+    '''fd_lambda : fd_return_header OP_FLECHA arithmetic_expression DEL_SEMICOLON
+                 | fd_return_header OP_FLECHA boolean_expression DEL_SEMICOLON
+                 | fd_return_header OP_FLECHA valor DEL_SEMICOLON'''
     global log
-    log += f"Declaracion de funcion: Lambda '{p[2]}'\n"
+    log += f"Declaracion de funcion: Lambda '{p[1][1]}'\n"
+    semantic.current_function_type = None
 
 # Impresión y Solicitud de datos
 def p_io_print(p):

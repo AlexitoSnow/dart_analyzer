@@ -1,0 +1,5 @@
+Declaracion de variable: Inmutabilidad 'limite'
+Reasignacion de variable: 'limite'
+Declaracion de variable: Tipado estatico 'resultado'
+Declaracion de funcion: Void 'main'
+

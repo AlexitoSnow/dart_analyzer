@@ -1,0 +1,8 @@
+Declaracion de variable: Inferencia de tipo 'variable'
+Error Sintactico: Estructura no valida cerca de 'variable' en la linea 16
+Declaracion de funcion: Void 'main'
+Error Sintactico: Estructura no valida cerca de ';' en la linea 21
+Error Sintactico: Estructura no valida cerca de '3' en la linea 24
+Declaracion de funcion: Void 'test'
+Declaracion de clase: 'MyClass'
+

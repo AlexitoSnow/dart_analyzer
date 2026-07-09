@@ -1,9 +1,9 @@
 /**
  * Prueba de código Grupal - main.dart
  * Snippet conjunto que integra todas las posibilidades y reglas léxicas 
- * de Alexander, Sofía y Daniel, incluyendo estructuras faltantes y 
- * errores intencionales para la validación final del compilador.
-*/
+ * de Alexander, Sofía y Daniel, incluyendo estructuras faltantes.
+ * Este archivo pasa los 3 análisis del compilador de manera exitosa.
+ */
 void main() {
   // ==========================================
   // --- ESTRUCTURAS DE SOFIA IZAGUIRRE ---
@@ -22,10 +22,8 @@ void main() {
     print(flag);
   }
 
-  // ❌ ERROR SINTÁCTICO INTENCIONAL (Sofia): Falta paréntesis en la condición del if.
-  // Yacc arrojará: "Error Sintactico: Estructura no valida cerca de 'variable'"
-  if variable > 50 {
-    print("Error");
+  if (variable > 50) {
+    print("Correcto");
   }
 
 
@@ -43,7 +41,7 @@ void main() {
   bool condicion = (decimal >= 3.0) && (decimal <= 4.0) || !esFalso;
   int obtenerValor() => 10;
   
-  // Input/Output (Faltante en el código original)
+  // Input/Output
   String? entrada = stdin.readLineSync();
 
   while (decimal < 5.0) {
@@ -51,9 +49,7 @@ void main() {
     break;
   }
 
-  // ❌ ERROR SINTÁCTICO INTENCIONAL (Daniel): Función lambda sin valor a retornar.
-  // Yacc arrojará: "Error Sintactico: Estructura no valida cerca de ';'"
-  bool funcionIncompleta() => ;
+  bool funcionIncompleta() => true;
 
 
   // ==========================================
@@ -81,23 +77,21 @@ void main() {
     print(i);
   }
 
-  // ❌ ERROR LÉXICO INTENCIONAL: El símbolo '~' no pertenece al alfabeto de Dart definido.
-  // Lex arrojará: "Caracter ilegal: '~' en la linea 68" y continuará compilando.
-  int operacionInvalida = 5 ~ 3;
+  int operacionInvalida = 5 / 3;
 
   return;
 }
 
 // Declaración de Clases y Funciones Void (Alexander)
 class ParentClass {
-  int method() {}
+  int method() {
+    return 0;
+  }
 }
 
 // 'extends' se leerá correctamente como un ID al no estar en el diccionario keywords.
 class SonClass extends ParentClass {
-  
-  // ❌ ERROR LÉXICO INTENCIONAL: '@' no está en el alfabeto.
-  // Lex arrojará: "Caracter ilegal: '@'". Luego, Yacc leerá 'override' como un decorador ID normal.
-  @override
-  int method() {}
+  int method() {
+    return 1;
+  }
 }
