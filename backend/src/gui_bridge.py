@@ -62,11 +62,19 @@ def execute_lexical_pass(code, author_idx):
 
 def execute_syntactic_pass(code, author_idx):
     """Executes syntactic analysis, writes logs, and reports errors if found."""
+    import io
     lexer = lex.lex(module=lexical)
     lexer.lineno = 1
     lexer.input(code)
     try:
-        result = syntactic_analysis(lexer)
+        # Silenciar stdout temporalmente para evitar logs semánticos del parser
+        old_stdout = sys.stdout
+        sys.stdout = io.StringIO()
+        try:
+            result = syntactic_analysis(lexer)
+        finally:
+            sys.stdout = old_stdout
+
         write_syntactic_log(author_idx, result)
         if "Error Sintactico" in result:
             sys.stderr.write(result)
