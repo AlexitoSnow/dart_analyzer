@@ -1,0 +1,6 @@
+Declaracion de variable: Tipado estatico 'x'
+Declaracion de variable: Tipado estatico 'x'
+Error Sintactico: Estructura no valida cerca de ')' en la linea 7
+Declaracion de funcion: Void 'main'
+Error Sintactico: Estructura no valida cerca de '}' en la linea 11
+

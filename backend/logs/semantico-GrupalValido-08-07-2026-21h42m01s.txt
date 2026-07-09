@@ -1,0 +1,2 @@
+Analisis Semantico Exitoso: No se encontraron errores de Scope o Tipos.
+

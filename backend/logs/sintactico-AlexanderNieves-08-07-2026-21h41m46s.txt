@@ -1,0 +1,6 @@
+Declaracion de funcion: Retorno 'funcionIncorrecta1'
+Declaracion de funcion: Void 'funcionIncorrecta2'
+Declaracion de variable: Tipado estatico 'x'
+Estructura de control: For
+Declaracion de funcion: Void 'main'
+

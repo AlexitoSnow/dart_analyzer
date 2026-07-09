@@ -1,0 +1,37 @@
+Declaracion de variable: Inferencia de tipo 'variable'
+Declaracion de variable: Inmutabilidad 'miEntero'
+Declaracion de variable: Inmutabilidad 'flag'
+Declaracion de estructura: Map
+Declaracion de estructura: Map
+Impresion de datos: print
+Impresion de datos: print
+Estructura de control: IF-ELSE
+Impresion de datos: print
+Estructura de control: IF
+Declaracion de variable: Tipado estatico 'decimal'
+Declaracion de variable: Tipado estatico 'esFalso'
+Declaracion de variable nulable con valor: 'numeroNulable' = null
+Declaracion de estructura: Set
+Declaracion de estructura: Set
+Declaracion de variable: Tipado estatico 'condicion'
+Declaracion de funcion: Lambda 'obtenerValor'
+Solicitud de datos: readLineSync a la variable 'entrada'
+Estructura de control: While
+Declaracion de funcion: Lambda 'funcionIncompleta'
+Declaracion de variable: Tipado estatico 'cadenaDoble'
+Declaracion de variable: Tipado estatico 'cadenaSimple'
+Declaracion de estructura: List 'miLista'
+Declaracion de variable: Inferencia de tipo 'nulo'
+Declaracion de variable: Tipado estatico 'calculo'
+Impresion de datos: print
+Impresion de datos: print
+Estructura de control: Switch
+Impresion de datos: print
+Estructura de control: For
+Declaracion de variable: Tipado estatico 'operacionInvalida'
+Declaracion de funcion: Void 'main'
+Declaracion de funcion: Retorno 'method'
+Declaracion de clase: 'ParentClass'
+Declaracion de funcion: Retorno 'method'
+Declaracion de clase: 'SonClass'
+

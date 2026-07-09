@@ -1,0 +1,3 @@
+Error Semantico (Linea 5): La variable 'x' ya esta declarada en este alcance.
+Error Semantico (Linea 10): La variable 'y' esta fuera de alcance (scope) o no ha sido declarada.
+
