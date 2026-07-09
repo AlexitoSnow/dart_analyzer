@@ -10,9 +10,15 @@ Este es un proyecto para la materia de **Lenguajes de Programación**. Consiste 
 
 ## Estructura del Proyecto
 
-Actualmente, el proyecto está organizado de la siguiente manera:
+El proyecto está organizado de la siguiente manera:
 
-* **`backend/`**: Contiene todo el motor de análisis desarrollado en **Python** (analizador léxico, semántico y sintáctico), junto con su entorno virtual y configuraciones de ejecución.
+* **`backend/`**: Contiene el motor de compilación y análisis desarrollado en **Python** (analizador léxico, sintáctico y semántico), junto con su propio entorno virtual y los algoritmos Dart de prueba.
+* **`frontend/`**: Contiene la interfaz gráfica de usuario (GUI) desarrollada con **CustomTkinter** en Python, que permite cargar, editar y ejecutar el analizador de forma visual y amigable.
 
-> [!NOTE]
-> Para conocer detalles sobre cómo configurar, ejecutar y probar el analizador en Python, por favor consulta el [README de backend](backend/README.md).
+---
+
+## Documentación Detallada
+
+* Para conocer los detalles sobre el motor de análisis y cómo probarlo desde la consola de comandos, consulta el [README de backend](backend/README.md).
+* Para conocer los detalles sobre cómo instalar, ejecutar y utilizar la interfaz gráfica de usuario, consulta el [README de frontend](frontend/README.md).
+
