@@ -4,24 +4,18 @@
         {
             "label": "Initialize venv",
             "type": "shell",
-            "command": "python3 -m venv venv",
+            "command": "python3 -m venv backend/venv && python3 -m venv frontend/venv",
             "windows": {
-                "command": "python -m venv venv"
-            },
-            "options": {
-                "cwd": "${workspaceFolder}/backend"
+                "command": "python -m venv backend/venv && python -m venv frontend/venv"
             },
             "problemMatcher": []
         },
         {
             "label": "Install Dependencies",
             "type": "shell",
-            "command": "venv/bin/python -m pip install -r requirements.txt",
+            "command": "backend/venv/bin/python -m pip install -r backend/requirements.txt && frontend/venv/bin/python -m pip install -r frontend/requirements.txt",
             "windows": {
-                "command": ".\\venv\\Scripts\\python.exe -m pip install -r requirements.txt"
-            },
-            "options": {
-                "cwd": "${workspaceFolder}/backend"
+                "command": ".\\backend\\venv\\Scripts\\python.exe -m pip install -r backend\\requirements.txt && .\\frontend\\venv\\Scripts\\python.exe -m pip install -r frontend\\requirements.txt"
             },
             "problemMatcher": [],
             "dependsOn": "Initialize venv"
